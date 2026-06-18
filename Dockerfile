@@ -1,0 +1,23 @@
+FROM php:8.4-cli
+
+WORKDIR /app
+
+# install dependency
+RUN apt-get update && apt-get install -y \
+    git unzip curl libzip-dev zip \
+    && docker-php-ext-install zip
+
+# install composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# copy project
+COPY . .
+
+# install laravel dependency
+RUN composer install --no-dev --optimize-autoloader
+
+# expose port
+EXPOSE 8080
+
+# run app
+CMD php artisan serve --host=0.0.0.0 --port=8080
