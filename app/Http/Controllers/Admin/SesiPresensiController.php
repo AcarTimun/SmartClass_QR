@@ -20,6 +20,38 @@ class SesiPresensiController extends Controller
             'status' => 'dibuka',
         ]);
 
-        return back()->with('success', 'Presensi dibuka');
+        return redirect()->route('admin.presensi.qr', $sesi->qr_token);
+    }
+
+    public function qr($token)
+    {
+        $sesi = SesiPresensi::where('qr_token', $token)->firstOrFail();
+
+        return view('admin.presensi.qr', compact('sesi'));
+    }
+
+    public function scan($token)
+    {
+        $sesi = SesiPresensi::where('qr_token', $token)->firstOrFail();
+
+        // cek masih aktif atau nggak
+        if (!$sesi->isDibuka()) {
+            return "Presensi sudah ditutup";
+        }
+
+        return "QR valid, lanjut simpan kehadiran nanti";
+    }
+
+    public function aktif($jadwal_id)
+    {
+        $sesi = SesiPresensi::where('jadwal_kuliah_id', $jadwal_id)
+            ->latest()
+            ->first();
+
+        if (!$sesi || !$sesi->isDibuka()) {
+            return back()->with('error', 'Tidak ada sesi aktif');
+        }
+
+        return redirect()->route('admin.presensi.qr', $sesi->qr_token);
     }
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\MataKuliahController;
 use App\Http\Controllers\Admin\DosenController;
 use App\Http\Controllers\Admin\MahasiswaController;
 use App\Http\Controllers\Admin\JadwalKuliahController;
+use App\Http\Controllers\Admin\SesiPresensiController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -77,6 +78,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/presensi/{jadwal}', [SesiPresensiController::class, 'buka'])
         ->name('admin.presensi.buka');
 
+    // QR
+    Route::get('/admin/presensi/{token}/qr', [SesiPresensiController::class, 'qr'])
+        ->name('admin.presensi.qr');
+    // sesi QR Aktif
+    Route::get('/admin/presensi/{jadwal}/aktif', [SesiPresensiController::class, 'aktif'])
+        ->name('admin.presensi.aktif');
+
 });
 
 // group dosen
@@ -91,7 +99,11 @@ Route::middleware(['auth', 'role:dosen'])->group(function () {
 Route::middleware(['auth', 'role:mahasiswa'])->group(function () {
     Route::view('/mahasiswa/dashboard', 'mahasiswa.dashboard')
         ->name('mahasiswa.dashboard');
+    // QR Scan
+    Route::get('/scan/{token}', [SesiPresensiController::class, 'scan'])
+    ->name('presensi.scan');
 });
+
 
 
 require __DIR__.'/auth.php';

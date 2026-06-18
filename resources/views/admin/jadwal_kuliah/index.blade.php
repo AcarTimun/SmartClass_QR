@@ -74,9 +74,10 @@
                 <td class="p-4 align-middle">
                     <div class="flex gap-3 items-center">
                         @if ($item->sesiPresensi && $item->sesiPresensi->isDibuka())
-                            <button class="bg-gray-400 text-white px-3 py-1 rounded text-sm cursor-not-allowed" disabled>
-                                Sedang Dibuka
-                            </button>
+                            <a href="{{ route('admin.presensi.aktif', $item->id) }}"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
+                                Lihat QR
+                            </a>
                         @else
                             <form action="{{ route('admin.presensi.buka', $item->id) }}" method="POST">
                                 @csrf
