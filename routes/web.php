@@ -21,25 +21,26 @@ use App\Http\Controllers\Admin\JadwalKuliahController;
 //     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 // });
+
 // tes routes
-Route::get('/', function () {
-    return 'SmartClass QR LIVE 🚀';
-});
+// Route::get('/', function () {
+//     return 'SmartClass QR LIVE 🚀';
+// });
 
 // halaman utama
-// Route::get('/', function () {
+Route::get('/', function () {
 
-//     if (!auth()->check()) {
-//         return redirect()->route('login');
-//     }
+    if (!auth()->check()) {
+        return redirect()->route('login');
+    }
 
-//     return match (auth()->user()->role) {
-//         'admin' => redirect()->route('admin.dashboard'),
-//         'dosen' => redirect()->route('dosen.dashboard'),
-//         'mahasiswa' => redirect()->route('mahasiswa.dashboard'),
-//         default => abort(403),
-//     };
-// });
+    return match (auth()->user()->role) {
+        'admin' => redirect()->route('admin.dashboard'),
+        'dosen' => redirect()->route('dosen.dashboard'),
+        'mahasiswa' => redirect()->route('mahasiswa.dashboard'),
+        default => abort(403),
+    };
+});
 
 // group admin
 Route::middleware(['auth', 'role:admin'])->group(function () {
