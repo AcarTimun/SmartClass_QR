@@ -24,4 +24,19 @@ class SesiPresensi extends Model
     {
         return $this->hasMany(Kehadiran::class);
     }
+
+    public function isDibuka()
+    {
+        return $this->status === 'dibuka'
+            && now()->diffInMinutes($this->created_at) <= 30;
+    }
+
+    public function getStatusLabelAttribute()
+    {
+        if ($this->isDibuka()) {
+            return 'Dibuka';
+        }
+
+        return 'Ditutup';
+    }
 }

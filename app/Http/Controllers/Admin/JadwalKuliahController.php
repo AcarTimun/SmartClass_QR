@@ -17,7 +17,8 @@ class JadwalKuliahController extends Controller
             'dosen.user',
             'mataKuliah',
             'kelas',
-        ])->latest()->get();
+            'sesiPresensi'
+        ])->get();
 
         return view('admin.jadwal_kuliah.index', compact('jadwalKuliah'));
     }

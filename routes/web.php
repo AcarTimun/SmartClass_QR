@@ -73,6 +73,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('/admin/jadwal-kuliah', JadwalKuliahController::class)
         ->except(['show'])
         ->names('admin.jadwal_kuliah');
+
+    Route::post('/admin/presensi/{jadwal}', [SesiPresensiController::class, 'buka'])
+        ->name('admin.presensi.buka');
+
 });
 
 // group dosen

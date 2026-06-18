@@ -30,6 +30,7 @@
             <th class="p-3 text-left">Hari</th>
             <th class="p-3 text-left">Jam</th>
             <th class="p-3 text-left">Aksi</th>
+            <th class="p-3 text-left">Status Presensi</th>
         </tr>
     </thead>
 
@@ -70,26 +71,57 @@
                     {{ \Carbon\Carbon::parse($item->jam_selesai)->format('H:i') }}
                 </td>
 
-                <td class="p-3 flex gap-2">
+                <td class="p-4 align-middle">
+                    <div class="flex gap-3 items-center">
+                        @if ($item->sesiPresensi && $item->sesiPresensi->isDibuka())
+                            <button class="bg-gray-400 text-white px-3 py-1 rounded text-sm cursor-not-allowed" disabled>
+                                Sedang Dibuka
+                            </button>
+                        @else
+                            <form action="{{ route('admin.presensi.buka', $item->id) }}" method="POST">
+                                @csrf
+                                <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
+                                    Buka Presensi
+                                </button>
+                            </form>
+                        @endif
 
-                    <a href="{{ route('admin.jadwal_kuliah.edit', $item) }}"
-                       class="bg-yellow-500 text-white px-3 py-1 rounded">
-                        Edit
-                    </a>
+                        <a href="{{ route('admin.jadwal_kuliah.edit', $item) }}"
+                        class="bg-yellow-600 text-white px-3 py-1 rounded text-sm" >
+                            Edit
+                        </a>
 
-                    <form action="{{ route('admin.jadwal_kuliah.destroy', $item) }}"
-                          method="POST"
-                          class="delete-form">
+                        <form action="{{ route('admin.jadwal_kuliah.destroy', $item) }}"
+                            method="POST"
+                            class="delete-form">
 
-                        @csrf
-                        @method('DELETE')
+                            @csrf
+                            @method('DELETE')
 
-                        <button class="bg-red-600 text-white px-3 py-1 rounded">
-                            Hapus
-                        </button>
+                            <button class="bg-red-600 text-white px-3 py-1 rounded text-sm">
+                                Hapus
+                            </button>
 
-                    </form>
+                        </form>
+                    </div>
 
+
+
+                </td>
+                <td class="p-3">
+                    @if ($item->sesiPresensi)
+                        @php $status = $item->sesiPresensi->status_label; @endphp
+                            <span class="
+                                px-3 py-1 rounded-full text-xs font-semibold
+                                {{ $status == 'Dibuka' ? 'bg-green-100 text-green-700' : '' }}
+                                {{ $status == 'Expired' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                                {{ $status == 'Ditutup' ? 'bg-red-100 text-red-700' : '' }}
+                            ">
+                                {{ $status }}
+                            </span>
+                    @else
+                        <span class="text-gray-400">Belum ada sesi</span>
+                    @endif
                 </td>
 
             </tr>
@@ -97,7 +129,7 @@
         @empty
 
             <tr>
-                <td colspan="7" class="p-3 text-center">
+                <td colspan="8" class="p-3 text-center">
                     Belum ada data jadwal kuliah
                 </td>
             </tr>

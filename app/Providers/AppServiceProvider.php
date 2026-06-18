@@ -20,11 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        URL::forceRootUrl('https://smartclass-qr.up.railway.app');
-        URL::forceScheme('https');
-
-        if (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
-            $_SERVER['HTTPS'] = 'on';
+        if (app()->environment('production')) {
+            URL::forceRootUrl(config('app.url'));
+            URL::forceScheme('https');
         }
     }
 }
