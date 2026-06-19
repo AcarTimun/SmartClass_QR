@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\DosenController;
 use App\Http\Controllers\Admin\MahasiswaController;
 use App\Http\Controllers\Admin\JadwalKuliahController;
 use App\Http\Controllers\Admin\SesiPresensiController;
+use App\Http\Controllers\Admin\JadwalKuliah;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -84,6 +85,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // sesi QR Aktif
     Route::get('/admin/presensi/{jadwal}/aktif', [SesiPresensiController::class, 'aktif'])
         ->name('admin.presensi.aktif');
+    // lihat absen
+    Route::get('/admin/presensi/{jadwal}/lihat', [SesiPresensiController::class, 'lihat'])
+        ->name('admin.presensi.lihat');
 
 });
 

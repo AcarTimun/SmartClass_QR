@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\SesiPresensi;
 use Illuminate\Support\Str;
-
+use App\Models\JadwalKuliah;
 
 
 class SesiPresensiController extends Controller
@@ -53,5 +53,16 @@ class SesiPresensiController extends Controller
         }
 
         return redirect()->route('admin.presensi.qr', $sesi->qr_token);
+    }
+
+    public function lihat($jadwal_id)
+    {
+        $jadwal = JadwalKuliah::with('kelas.mahasiswa')->findOrFail($jadwal_id);
+
+        $sesi = SesiPresensi::where('jadwal_kuliah_id', $jadwal_id)
+            ->latest()
+            ->first();
+
+        return view('admin.presensi.lihat', compact('jadwal', 'sesi'));
     }
 }

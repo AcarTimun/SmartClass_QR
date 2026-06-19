@@ -17,7 +17,7 @@ class Kehadiran extends Model
 
     public function sesiPresensi()
     {
-        return $this->belongsTo(SesiPresensi::class);
+        return $this->belongsTo(SesiPresensi::class, 'sesi_presensi_id');
     }
 
     public function mahasiswa()

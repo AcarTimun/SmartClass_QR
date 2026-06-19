@@ -87,8 +87,11 @@
                             </form>
                         @endif
 
-                        <a href="{{ route('admin.jadwal_kuliah.edit', $item) }}"
-                        class="bg-yellow-600 text-white px-3 py-1 rounded text-sm" >
+                        <a href="{{ route('admin.presensi.lihat', $item->id) }}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-sm">
+                            Lihat Absensi
+                        </a>
+
+                        <a href="{{ route('admin.jadwal_kuliah.edit', $item) }}" class="bg-yellow-600 text-white px-3 py-1 rounded text-sm" >
                             Edit
                         </a>
 
