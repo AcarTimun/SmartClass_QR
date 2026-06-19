@@ -50,7 +50,6 @@ class SesiPresensiController extends Controller
     {
         $sesi = SesiPresensi::where('qr_token', $token)->firstOrFail();
 
-        // cek masih aktif atau nggak
         if (!$sesi->isDibuka()) {
             return "Presensi sudah ditutup";
         }
@@ -62,13 +61,15 @@ class SesiPresensiController extends Controller
         $user = Auth::user();
 
         if ($user->role !== 'mahasiswa') {
-            return "Hanya mahasiswa yang bisa absen";
+            return view('mahasiswa.scan')
+                ->with('error', 'Hanya mahasiswa yang bisa absen');
         }
 
         $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
 
         if (!$mahasiswa) {
-            return "Data mahasiswa tidak ditemukan";
+            return view('mahasiswa.scan')
+                ->with('error', 'Data mahasiswa tidak ditemukan');
         }
 
         Kehadiran::updateOrCreate(
@@ -81,8 +82,8 @@ class SesiPresensiController extends Controller
             ]
         );
 
-        return redirect()->route('mahasiswa.dashboard')
-            ->with('success', 'Berhasil absen');
+        return view('mahasiswa.scan')
+            ->with('success', 'Berhasil Absen!');
     }
 
     public function aktif($jadwal_id)

@@ -11,24 +11,26 @@
 </head>
 <body class="bg-gray-100">
 
-    <div class="min-h-screen p-6">
+    <div class="min-h-screen flex flex-col">
 
         {{-- HEADER --}}
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-xl font-bold">
-                SmartClass QR
-            </h1>
+        <div class="bg-blue-600 text-white p-4 flex justify-between">
+            <span>
+                Halo, {{ auth()->user()->name }}
+            </span>
 
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button class="text-red-500 hover:text-red-700">
+                <button class="text-red-200 hover:text-white">
                     Logout
                 </button>
             </form>
         </div>
 
         {{-- CONTENT --}}
-        @yield('content')
+        <div class="flex-1 p-6">
+            @yield('content')
+        </div>
 
     </div>
 
@@ -38,8 +40,18 @@ Swal.fire({
     icon: 'success',
     title: 'Berhasil',
     text: '{{ session('success') }}',
-    timer: 2000,
-    showConfirmButton: false
+    confirmButtonText: 'OK'
+});
+</script>
+@endif
+
+@if(session('error'))
+<script>
+Swal.fire({
+    icon: 'error',
+    title: 'Gagal',
+    text: '{{ session('error') }}',
+    confirmButtonText: 'OK'
 });
 </script>
 @endif

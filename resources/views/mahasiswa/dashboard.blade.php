@@ -11,15 +11,24 @@
     <div class="space-y-3 text-left">
 
         <div>
-            <span class="font-semibold">Nama:</span><br>
+            <span class="font-semibold">Nama :</span><br>
             {{ auth()->user()->name }}
         </div>
 
         <div>
-            <span class="font-semibold">NIM:</span><br>
+            <span class="font-semibold">NIM :</span><br>
             {{ auth()->user()->mahasiswa->nim ?? '-' }}
         </div>
 
+        <div>
+            <span class="font-semibold">PRODI :</span><br>
+            {{ auth()->user()->mahasiswa->prodi ?? '-' }}
+        </div>
+
+        <a href="{{ route('mahasiswa.scan.camera') }}"
+            class="bg-blue-600 text-white px-6 py-3 rounded block text-center">
+                Absen (Scan QR)
+        </a>
 
 
     </div>

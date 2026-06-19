@@ -137,6 +137,10 @@ Route::middleware(['auth', 'role:mahasiswa'])->group(function () {
     // QR Scan
     Route::get('/scan/{token}', [SesiPresensiController::class, 'scan'])
     ->name('presensi.scan');
+    // Scan Kamera
+    Route::get('/scan-camera', function () {
+        return view('mahasiswa.scan_camera');
+    })->name('mahasiswa.scan.camera');
 });
 
 
