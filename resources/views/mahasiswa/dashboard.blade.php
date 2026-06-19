@@ -25,6 +25,11 @@
             {{ auth()->user()->mahasiswa->prodi ?? '-' }}
         </div>
 
+        <div>
+            <span class="font-semibold">KELAS :</span><br>
+            {{ auth()->user()->mahasiswa->kelas->nama_kelas ?? '-' }}
+        </div>
+
         <a href="{{ route('mahasiswa.scan.camera') }}"
             class="bg-blue-600 text-white px-6 py-3 rounded block text-center">
                 Absen (Scan QR)

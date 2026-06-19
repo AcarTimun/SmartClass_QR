@@ -28,13 +28,15 @@ class SesiPresensi extends Model
 
     public function isDibuka()
     {
-        if ($this->status !== 'dibuka') {
-            return false;
-        }
+        // if ($this->status !== 'dibuka') {
+        //     return false;
+        // }
 
-        return Carbon::now()->lessThan(
-            $this->created_at->addMinutes(30)
-        );
+        // return Carbon::now()->lessThan(
+        //     $this->created_at->addMinutes(30)
+        // );
+
+        return $this->status === 'dibuka';
     }
 
     public function getStatusLabelAttribute()

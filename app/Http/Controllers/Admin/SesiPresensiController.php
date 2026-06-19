@@ -51,26 +51,31 @@ class SesiPresensiController extends Controller
     {
         $sesi = SesiPresensi::where('qr_token', $token)->firstOrFail();
 
-        if (!$sesi->isDibuka()) {
-            return "Presensi sudah ditutup";
-        }
-
         if (!Auth::check()) {
             return redirect()->route('login');
         }
 
         $user = Auth::user();
 
-        if ($user->role !== 'mahasiswa') {
-            return view('mahasiswa.scan')
-                ->with('error', 'Hanya mahasiswa yang bisa absen');
+        if (!$sesi->isDibuka()) {
+            session()->flash('error', 'Presensi sudah ditutup / expired');
+
+            return view('mahasiswa.scan');
         }
+
+        if ($user->role !== 'mahasiswa') {
+            session()->flash('error', 'Hanya mahasiswa yang bisa absen');
+
+            return view('mahasiswa.scan');
+        }
+
 
         $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
 
         if (!$mahasiswa) {
-            return view('mahasiswa.scan')
-                ->with('error', 'Data mahasiswa tidak ditemukan');
+            session()->flash('error', 'Data mahasiswa tidak ditemukan');
+
+            return view('mahasiswa.scan');
         }
 
         Kehadiran::updateOrCreate(
@@ -80,14 +85,18 @@ class SesiPresensiController extends Controller
             ],
             [
                 'status' => 'H',
-                'waktu_scan' => Carbon::now(),
+                'waktu_scan' => now(),
             ]
         );
+
+        session()->flash('success', 'Berhasil absen!');
+
         return view('mahasiswa.scan', [
             'mahasiswa' => $mahasiswa,
             'sesi' => $sesi,
-            'waktu' => Carbon::now(),
-        ])->with('success', 'Berhasil absen!');
+            'waktu' => now(),
+        ]);
+
     }
 
     public function aktif($jadwal_id)
@@ -162,6 +171,9 @@ class SesiPresensiController extends Controller
                 'tidak_hadir' => 'X',
                 default => '-',
             };
+
+
+
 
             Kehadiran::updateOrCreate(
                 [

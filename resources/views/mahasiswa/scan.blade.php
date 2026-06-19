@@ -6,42 +6,48 @@
 
     <div class="bg-white p-8 rounded shadow text-center w-full max-w-md">
 
-        {{-- ICON --}}
         @if(session('success'))
-            <div class="text-green-500 text-5xl mb-4">✔</div>
+
+            <h1 class="text-2xl font-bold mb-4 text-green-600">
+                Presensi Berhasil
+            </h1>
+
+            <div class="bg-green-100 text-green-700 p-3 rounded mb-4">
+                {{ session('success') }}
+            </div>
+
+            <p class="text-gray-600 mb-2">
+                {{ $mahasiswa->user->name }}
+            </p>
+
+            <p class="text-gray-500 mb-4">
+                {{ $waktu->format('H:i A') }}
+            </p>
+
+        @elseif(session('error'))
+
+            <h1 class="text-2xl font-bold mb-4 text-red-600">
+                Presensi Gagal
+            </h1>
+
+            <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
+                {{ session('error') }}
+            </div>
+
         @else
-            <div class="text-red-500 text-5xl mb-4">✖</div>
-        @endif
 
-        {{-- TITLE --}}
-        <h2 class="text-xl font-bold mb-2">
-            {{ session('success') ? 'Presensi Berhasil' : 'Presensi Gagal' }}
-        </h2>
+            <h1 class="text-2xl font-bold mb-4">
+                Scan Presensi
+            </h1>
 
-        {{-- MESSAGE --}}
-        <p class="text-gray-600 mb-4">
-            {{ session('success') ?? session('error') }}
-        </p>
-
-        @if(session('success'))
-        <div class="text-left bg-gray-100 p-4 rounded mb-4 text-sm">
-
-            <p><strong>Nama:</strong> {{ $mahasiswa->user->name }}</p>
-
-            <p><strong>Mata Kuliah:</strong>
-                {{ $sesi->jadwalKuliah->mataKuliah->nama_mk ?? '-' }}
+            <p class="text-gray-600 mb-4">
+                Menunggu scan QR...
             </p>
 
-            <p><strong>Waktu:</strong>
-                {{ \Carbon\Carbon::parse($waktu)->format('h:i A') }}
-            </p>
-
-        </div>
         @endif
 
-        {{-- BUTTON --}}
         <a href="{{ route('mahasiswa.dashboard') }}"
-           class="bg-blue-600 text-white px-4 py-2 rounded">
+           class="bg-blue-600 text-white px-4 py-2 rounded mt-3 inline-block">
             Kembali ke Dashboard
         </a>
 
