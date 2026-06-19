@@ -8,7 +8,7 @@ use App\Http\Controllers\Admin\DosenController;
 use App\Http\Controllers\Admin\MahasiswaController;
 use App\Http\Controllers\Admin\JadwalKuliahController;
 use App\Http\Controllers\Admin\SesiPresensiController;
-use App\Http\Controllers\Admin\JadwalKuliah;
+
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -76,19 +76,32 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         ->except(['show'])
         ->names('admin.jadwal_kuliah');
 
-    Route::post('/admin/presensi/{jadwal}', [SesiPresensiController::class, 'buka'])
+    Route::post('/admin/presensi/buka/{jadwal}', [SesiPresensiController::class, 'buka'])
         ->name('admin.presensi.buka');
 
     // QR
-    Route::get('/admin/presensi/{token}/qr', [SesiPresensiController::class, 'qr'])
+    Route::get('/admin/presensi/qr/{token}', [SesiPresensiController::class, 'qr'])
         ->name('admin.presensi.qr');
+
     // sesi QR Aktif
     Route::get('/admin/presensi/{jadwal}/aktif', [SesiPresensiController::class, 'aktif'])
         ->name('admin.presensi.aktif');
+
     // lihat absen
     Route::get('/admin/presensi/{jadwal}/lihat', [SesiPresensiController::class, 'lihat'])
         ->name('admin.presensi.lihat');
 
+    // tutup QR
+        Route::post('/admin/presensi/{id}/tutup', [SesiPresensiController::class, 'tutup'])
+        ->name('admin.presensi.tutup');
+
+    // Update Absen manual
+        Route::post('/admin/presensi/{sesi}/{mahasiswa}', [SesiPresensiController::class, 'update'])
+    ->name('admin.presensi.update');
+
+    // bulk update absen
+    Route::post('/admin/presensi/bulk', [SesiPresensiController::class, 'bulkUpdate'])
+        ->name('admin.presensi.bulk');
 });
 
 // group dosen

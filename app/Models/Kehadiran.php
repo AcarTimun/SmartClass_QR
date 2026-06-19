@@ -24,4 +24,14 @@ class Kehadiran extends Model
     {
         return $this->belongsTo(Mahasiswa::class);
     }
+
+    public function getStatusLabelAttribute()
+    {
+        return match ($this->status) {
+            'H' => 'Hadir',
+            'X' => 'Tidak Hadir',
+            '-' => 'Belum',
+            default => '-',
+        };
+    }
 }

@@ -77,11 +77,12 @@ class SesiPresensiController extends Controller
                 'mahasiswa_id' => $mahasiswa->id,
             ],
             [
-                'status' => 'hadir',
+                'status' => 'H',
             ]
         );
 
-        return "Berhasil absen 🎉";
+        return redirect()->route('mahasiswa.dashboard')
+            ->with('success', 'Berhasil absen');
     }
 
     public function aktif($jadwal_id)
@@ -107,5 +108,63 @@ class SesiPresensiController extends Controller
             ->first();
 
         return view('admin.presensi.lihat', compact('jadwal', 'sesi'));
+    }
+
+
+
+    public function tutup($id)
+    {
+        $sesi = SesiPresensi::findOrFail($id);
+
+        $sesi->update([
+            'status' => 'ditutup'
+        ]);
+
+        return redirect()->route('admin.jadwal_kuliah.index')
+            ->with('success', 'Presensi ditutup');
+    }
+
+    public function update($sesi_id, $mahasiswa_id, Request $request)
+    {
+        $status = $request->status == 'hadir' ? 'H' : 'X';
+
+        Kehadiran::updateOrCreate(
+            [
+                'sesi_presensi_id' => $sesi_id,
+                'mahasiswa_id' => $mahasiswa_id,
+            ],
+            [
+                'status' => $status,
+            ]
+        );
+
+        return back();
+    }
+
+    public function bulkUpdate(Request $request)
+    {
+        $sesi_id = $request->sesi_id;
+
+        foreach ($request->kehadiran as $mahasiswa_id => $status) {
+
+            $dbStatus = match ($status) {
+                'hadir' => 'H',
+                'tidak_hadir' => 'X',
+                default => '-',
+            };
+
+            Kehadiran::updateOrCreate(
+                [
+                    'sesi_presensi_id' => $sesi_id,
+                    'mahasiswa_id' => $mahasiswa_id,
+                ],
+                [
+                    'status' => $dbStatus,
+                ]
+            );
+        }
+
+        return redirect()->route('admin.jadwal_kuliah.index')
+            ->with('success', 'Absensi berhasil disimpan');
     }
 }
