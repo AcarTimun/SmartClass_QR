@@ -14,6 +14,7 @@ use BaconQrCode\Writer;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Mahasiswa;
 use App\Models\Kehadiran;
+use Carbon\Carbon;
 
 
 class SesiPresensiController extends Controller
@@ -79,11 +80,14 @@ class SesiPresensiController extends Controller
             ],
             [
                 'status' => 'H',
+                'waktu_scan' => Carbon::now(),
             ]
         );
-
-        return view('mahasiswa.scan')
-            ->with('success', 'Berhasil Absen!');
+        return view('mahasiswa.scan', [
+            'mahasiswa' => $mahasiswa,
+            'sesi' => $sesi,
+            'waktu' => Carbon::now(),
+        ])->with('success', 'Berhasil absen!');
     }
 
     public function aktif($jadwal_id)
