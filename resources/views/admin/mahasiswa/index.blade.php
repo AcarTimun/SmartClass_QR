@@ -19,6 +19,7 @@
             <th class="p-3 text-left">No</th>
             <th class="p-3 text-left">Nama</th>
             <th class="p-3 text-left">Email</th>
+            <th class="p-3 text-left">Prodi</th>
             <th class="p-3 text-left">NIM</th>
             <th class="p-3 text-left">Kelas</th>
             <th class="p-3 text-left">Aksi</th>
@@ -31,6 +32,7 @@
                 <td class="p-3">{{ $loop->iteration }}</td>
                 <td class="p-3">{{ $item->user->name }}</td>
                 <td class="p-3">{{ $item->user->email }}</td>
+                <td class="p-3">{{ $item->prodi }}</td>
                 <td class="p-3">{{ $item->nim }}</td>
                 <td class="p-3">{{ $item->kelas->nama_kelas }}</td>
 
@@ -54,7 +56,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="6" class="p-3 text-center">
+                <td colspan="7" class="p-3 text-center">
                     Belum ada data mahasiswa
                 </td>
             </tr>

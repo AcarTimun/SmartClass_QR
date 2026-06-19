@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+
 use App\Http\Controllers\Controller;
 use App\Models\Kelas;
 use App\Models\Mahasiswa;
@@ -11,6 +12,14 @@ use Illuminate\Support\Facades\Hash;
 
 class MahasiswaController extends Controller
 {
+    const PRODI = [
+        'Sistem Informasi',
+        'Teknologi Informasi',
+        'Sistem Komputer',
+        'Bisnis Digital',
+        'Teknologi Informatika'
+    ];
+
     public function index()
     {
         $mahasiswa = Mahasiswa::with(['user', 'kelas'])
@@ -33,6 +42,7 @@ class MahasiswaController extends Controller
         'name' => 'required|max:100',
         'email' => 'required|email|unique:users,email',
         'password' => 'required|min:8',
+        'prodi' => 'required|in:' . implode(',', self::PRODI),
         'nim' => 'required|max:50|unique:mahasiswa,nim',
         'kelas_id' => 'required|exists:kelas,id',
     ]);
@@ -48,6 +58,7 @@ class MahasiswaController extends Controller
 
         Mahasiswa::create([
             'user_id' => $user->id,
+            'prodi' => $validated['prodi'],
             'nim' => $validated['nim'],
             'kelas_id' => $validated['kelas_id'],
         ]);
@@ -74,8 +85,9 @@ class MahasiswaController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|max:100',
-            'email' => 'required|email|unique:users,email,' . $mahasiswa->user_id,
-            'nim' => 'required|max:50|unique:mahasiswa,nim,' . $mahasiswa->id,
+            'email' => 'required|email|unique:users,email,' . $mahasiswa->user_id . ',id',
+            'prodi' => 'required|in:' . implode(',', self::PRODI),
+            'nim' => 'required|max:50|unique:mahasiswa,nim,' . $mahasiswa->id . ',id',
             'kelas_id' => 'required|exists:kelas,id',
         ]);
 
@@ -87,6 +99,7 @@ class MahasiswaController extends Controller
             ]);
 
             $mahasiswa->update([
+                'prodi' => $validated['prodi'],
                 'nim' => $validated['nim'],
                 'kelas_id' => $validated['kelas_id'],
             ]);
@@ -99,7 +112,9 @@ class MahasiswaController extends Controller
 
     public function destroy(Mahasiswa $mahasiswa)
     {
-         $mahasiswa->user->delete();
+        DB::transaction(function () use ($mahasiswa) {
+            $mahasiswa->user->delete();
+        });
 
         return redirect()
             ->route('admin.mahasiswa.index')

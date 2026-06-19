@@ -120,6 +120,11 @@ class SesiPresensiController extends Controller
             'status' => 'ditutup'
         ]);
 
+        if (auth()->user()->role === 'dosen') {
+            return redirect()->route('dosen.jadwal_kuliah')
+                ->with('success', 'Presensi ditutup');
+        }
+
         return redirect()->route('admin.jadwal_kuliah.index')
             ->with('success', 'Presensi ditutup');
     }
@@ -166,5 +171,15 @@ class SesiPresensiController extends Controller
 
         return redirect()->route('admin.jadwal_kuliah.index')
             ->with('success', 'Absensi berhasil disimpan');
+    }
+
+    public function data($jadwal_id)
+    {
+        $sesi = SesiPresensi::with('kehadiran')
+            ->where('jadwal_kuliah_id', $jadwal_id)
+            ->latest()
+            ->first();
+
+        return response()->json($sesi->kehadiran);
     }
 }

@@ -102,6 +102,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // bulk update absen
     Route::post('/admin/presensi/bulk', [SesiPresensiController::class, 'bulkUpdate'])
         ->name('admin.presensi.bulk');
+
+    // API auto Update Absen
+    Route::get('/admin/presensi/{jadwal}/data', [SesiPresensiController::class, 'data'])
+        ->name('admin.presensi.data');
 });
 
 // group dosen
@@ -109,6 +113,20 @@ Route::middleware(['auth', 'role:dosen'])->group(function () {
     Route::view('/dosen/dashboard', 'dosen.dashboard')
         ->name('dosen.dashboard');
 
+    Route::get('/dosen/jadwal_kuliah', [JadwalKuliahController::class, 'indexDosen'])
+        ->name('dosen.jadwal_kuliah');
+
+    Route::post('/dosen/presensi/buka/{jadwal}', [SesiPresensiController::class, 'buka'])
+        ->name('dosen.presensi.buka');
+
+    Route::get('/dosen/presensi/qr/{token}', [SesiPresensiController::class, 'qr'])
+        ->name('dosen.presensi.qr');
+
+    Route::get('/dosen/presensi/{jadwal}/lihat', [SesiPresensiController::class, 'lihat'])
+        ->name('dosen.presensi.lihat');
+
+    Route::post('/dosen/presensi/{id}/tutup', [SesiPresensiController::class, 'tutup'])
+        ->name('dosen.presensi.tutup');
 
 });
 

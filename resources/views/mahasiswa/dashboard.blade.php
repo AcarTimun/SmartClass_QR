@@ -1,18 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Testing</title>
-</head>
-<body>
-    <h1>Dashboard Mahasiswa</h1>
+@extends('layouts.mahasiswa')
 
-    <p>Halo, {{ auth()->user()->name }}</p>
+@section('content')
 
-    <form method="POST" action="{{ route('logout') }}">
-        @csrf
-        <button type="submit">Logout</button>
-    </form>
-</body>
-</html>
+<div class="max-w-md mx-auto bg-white p-6 rounded shadow text-center">
+
+    <h2 class="text-xl font-bold mb-4">
+        Profil Mahasiswa
+    </h2>
+
+    <div class="space-y-3 text-left">
+
+        <div>
+            <span class="font-semibold">Nama:</span><br>
+            {{ auth()->user()->name }}
+        </div>
+
+        <div>
+            <span class="font-semibold">NIM:</span><br>
+            {{ auth()->user()->mahasiswa->nim ?? '-' }}
+        </div>
+
+
+
+    </div>
+
+</div>
+
+@endsection

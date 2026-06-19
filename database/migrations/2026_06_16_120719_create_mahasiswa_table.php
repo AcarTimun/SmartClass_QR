@@ -14,6 +14,15 @@ return new class extends Migration
         Schema::create('mahasiswa', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+
+            $table->enum('prodi', [
+                'Sistem Informasi',
+                'Teknologi Informasi',
+                'Sistem Komputer',
+                'Bisnis Digital',
+                'Teknologi Informatika'
+            ]);
+
             $table->string('nim')->unique();
             $table->foreignId('kelas_id')->constrained('kelas')->cascadeOnDelete();
             $table->timestamps();

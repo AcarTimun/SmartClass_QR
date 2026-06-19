@@ -29,6 +29,45 @@
     </div>
 
     <div class="mb-4">
+        <label class="block mb-2">Prodi</label>
+
+        <select name="prodi"
+                class="w-full border rounded p-2">
+
+            <option value="">Pilih Prodi</option>
+
+            <option value="Sistem Informasi"
+                {{ old('prodi') == 'Sistem Informasi' ? 'selected' : '' }}>
+                Sistem Informasi
+            </option>
+
+            <option value="Teknologi Informasi"
+                {{ old('prodi') == 'Teknologi Informasi' ? 'selected' : '' }}>
+                Teknologi Informasi
+            </option>
+
+            <option value="Sistem Komputer"
+                {{ old('prodi') == 'Sistem Komputer' ? 'selected' : '' }}>
+                Sistem Komputer
+            </option>
+
+            <option value="Bisnis Digital"
+                {{ old('prodi') == 'Bisnis Digital' ? 'selected' : '' }}>
+                Bisnis Digital
+            </option>
+
+            <option value="Teknologi Informatika"
+                {{ old('prodi') == 'Teknologi Informatika' ? 'selected' : '' }}>
+                Teknologi Informatika
+            </option>
+
+        </select>
+        @error('prodi')
+            <small class="text-red-500">{{ $message }}</small>
+        @enderror
+    </div>
+
+    <div class="mb-4">
         <label class="block mb-2">Password</label>
 
         <input type="password"

@@ -22,6 +22,11 @@ class JadwalKuliahController extends Controller
 
         return view('admin.jadwal_kuliah.index', compact('jadwalKuliah'));
     }
+    public function indexDosen(){
+        $jadwalKuliah = JadwalKuliah::where('dosen_id', auth()->user()->dosen->id)->get();
+
+        return view('dosen.jadwal.index', compact('jadwalKuliah'));
+    }
 
     public function create()
     {
