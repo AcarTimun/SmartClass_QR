@@ -7,13 +7,20 @@ use Illuminate\Http\Request;
 use App\Models\SesiPresensi;
 use Illuminate\Support\Str;
 use App\Models\JadwalKuliah;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Mahasiswa;
+use App\Models\Kehadiran;
 
 
 class SesiPresensiController extends Controller
 {
     public function buka($jadwal_id)
     {
-        SesiPresensi::create([
+        $sesi = SesiPresensi::create([
             'jadwal_kuliah_id' => $jadwal_id,
             'pertemuan' => 1, // nanti bisa dinamis
             'qr_token' => Str::random(40),
@@ -27,7 +34,16 @@ class SesiPresensiController extends Controller
     {
         $sesi = SesiPresensi::where('qr_token', $token)->firstOrFail();
 
-        return view('admin.presensi.qr', compact('sesi'));
+        $renderer = new ImageRenderer(
+            new RendererStyle(300),
+            new SvgImageBackEnd()
+        );
+
+        $writer = new Writer($renderer);
+
+        $qr = $writer->writeString(route('presensi.scan', $sesi->qr_token));
+
+        return view('admin.presensi.qr', compact('qr', 'sesi'));
     }
 
     public function scan($token)
@@ -39,7 +55,33 @@ class SesiPresensiController extends Controller
             return "Presensi sudah ditutup";
         }
 
-        return "QR valid, lanjut simpan kehadiran nanti";
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        $user = Auth::user();
+
+        if ($user->role !== 'mahasiswa') {
+            return "Hanya mahasiswa yang bisa absen";
+        }
+
+        $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
+
+        if (!$mahasiswa) {
+            return "Data mahasiswa tidak ditemukan";
+        }
+
+        Kehadiran::updateOrCreate(
+            [
+                'sesi_presensi_id' => $sesi->id,
+                'mahasiswa_id' => $mahasiswa->id,
+            ],
+            [
+                'status' => 'hadir',
+            ]
+        );
+
+        return "Berhasil absen 🎉";
     }
 
     public function aktif($jadwal_id)
@@ -59,7 +101,8 @@ class SesiPresensiController extends Controller
     {
         $jadwal = JadwalKuliah::with('kelas.mahasiswa')->findOrFail($jadwal_id);
 
-        $sesi = SesiPresensi::where('jadwal_kuliah_id', $jadwal_id)
+        $sesi = SesiPresensi::with('kehadiran')
+            ->where('jadwal_kuliah_id', $jadwal_id)
             ->latest()
             ->first();
 

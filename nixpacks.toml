@@ -1,4 +1,0 @@
-[phases.build]
-cmds = [
-  "composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-gd"
-]

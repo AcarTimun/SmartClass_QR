@@ -9,7 +9,7 @@
     </h1>
 
     <div class="flex justify-center">
-        {!! QrCode::size(300)->generate(route('presensi.scan', $sesi->qr_token)) !!}
+        {!! $qr !!}
     </div>
 
     <p class="mt-4 text-gray-600">
