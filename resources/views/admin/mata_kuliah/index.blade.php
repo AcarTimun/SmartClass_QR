@@ -1,81 +1,84 @@
 @extends('layouts.admin')
 
+@section('title', 'Data Mata Kuliah')
+
 @section('content')
 
-<div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold">
-        Data Mata Kuliah
-    </h1>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Manajemen Mata Kuliah</h1>
+        <p class="text-slate-500 mt-1">Kelola data mata kuliah untuk jadwal.</p>
+    </div>
 
     <a href="{{ route('admin.mata_kuliah.create') }}"
-       class="bg-blue-600 text-white px-4 py-2 rounded">
+       class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2 shadow-sm shadow-indigo-200">
+        <i class="ph ph-plus-circle text-xl"></i>
         Tambah Mata Kuliah
     </a>
 </div>
 
+<div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-slate-50/50 border-b border-slate-100">
+                    <th class="p-4 px-6 font-semibold text-slate-600 w-24">No</th>
+                    <th class="p-4 px-6 font-semibold text-slate-600">Kode MK</th>
+                    <th class="p-4 px-6 font-semibold text-slate-600">Nama Mata Kuliah</th>
+                    <th class="p-4 px-6 font-semibold text-slate-600">SKS</th>
+                    <th class="p-4 px-6 font-semibold text-slate-600 w-48">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                @forelse($mataKuliah as $item)
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="p-4 px-6 text-slate-500">
+                            {{ $loop->iteration }}
+                        </td>
+                        <td class="p-4 px-6">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium bg-slate-100 text-slate-700">
+                                {{ $item->kode_mk }}
+                            </span>
+                        </td>
+                        <td class="p-4 px-6">
+                            <div class="font-medium text-slate-800">{{ $item->nama_mk }}</div>
+                        </td>
+                        <td class="p-4 px-6 text-slate-600">
+                            {{ $item->sks }} SKS
+                        </td>
+                        <td class="p-4 px-6">
+                            <div class="flex items-center gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                <a href="{{ route('admin.mata_kuliah.edit', $item) }}"
+                                   class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center hover:bg-amber-100 transition-colors tooltip" title="Edit">
+                                    <i class="ph ph-pencil-simple text-lg"></i>
+                                </a>
 
-
-<table class="w-full bg-white rounded shadow">
-
-    <thead class="bg-gray-200">
-        <tr>
-            <th class="p-3 text-left">No</th>
-            <th class="p-3 text-left">Kode MK</th>
-            <th class="p-3 text-left">Nama Mata Kuliah</th>
-            <th class="p-3 text-left">SKS</th>
-            <th class="p-3 text-left">Aksi</th>
-        </tr>
-    </thead>
-
-    <tbody>
-
-        @forelse($mataKuliah as $item)
-            <tr class="border-t">
-
-                <td class="p-3">{{ $loop->iteration }}</td>
-
-                <td class="p-3">{{ $item->kode_mk }}</td>
-
-                <td class="p-3">{{ $item->nama_mk }}</td>
-
-                <td class="p-3">{{ $item->sks }}</td>
-
-                <td class="p-3 flex gap-2">
-
-                    <a href="{{ route('admin.mata_kuliah.edit', $item) }}"
-                       class="bg-yellow-500 text-white px-3 py-1 rounded">
-                        Edit
-                    </a>
-
-                    <form action="{{ route('admin.mata_kuliah.destroy', $item) }}"
-                          method="POST"
-                          class="delete-form">
-
-                        @csrf
-                        @method('DELETE')
-
-                        <button type="submit" class="bg-red-600 text-white px-3 py-1 rounded">
-                            Hapus
-                        </button>
-
-                    </form>
-
-                </td>
-
-            </tr>
-        @empty
-
-            <tr>
-                <td colspan="5" class="p-3 text-center">
-                    Belum ada data mata kuliah
-                </td>
-            </tr>
-
-        @endforelse
-
-    </tbody>
-
-</table>
+                                <form action="{{ route('admin.mata_kuliah.destroy', $item) }}"
+                                      method="POST"
+                                      class="delete-form m-0">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center hover:bg-rose-100 transition-colors" title="Hapus">
+                                        <i class="ph ph-trash text-lg"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="p-8 text-center">
+                            <div class="flex flex-col items-center justify-center text-slate-400">
+                                <i class="ph ph-empty text-5xl mb-3 text-slate-300"></i>
+                                <p class="text-slate-500 font-medium">Belum ada data mata kuliah</p>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <script>
     document.querySelectorAll('.delete-form').forEach(form => {
@@ -83,12 +86,19 @@
             e.preventDefault();
 
             Swal.fire({
-                title: 'Hapus Data Mata Kuliah Ini?',
+                title: 'Hapus Data Mata Kuliah?',
                 text: 'Data yang dihapus tidak dapat dikembalikan.',
                 icon: 'warning',
                 showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
                 confirmButtonText: 'Ya, hapus',
                 cancelButtonText: 'Batal',
+                customClass: {
+                    popup: 'rounded-3xl',
+                    confirmButton: 'rounded-xl',
+                    cancelButton: 'rounded-xl'
+                }
             }).then((result) => {
                 if (result.isConfirmed) {
                     form.submit();
