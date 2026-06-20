@@ -17,6 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
             at: '*',
         );
 
+        $middleware->web(append: [
+            \App\Http\Middleware\PreventBackHistory::class,
+        ]);
+
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);

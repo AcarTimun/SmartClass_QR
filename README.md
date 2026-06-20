@@ -23,8 +23,8 @@ Pastikan environment lokal Anda sudah terinstall komponen dasar berikut sebelum 
 
 1. **Clone repositori**
    ```bash
-   git clone <url-repo-ini>
-   cd smartclass-qr
+   git clone https://github.com/AcarTimun/SmartClass_QR.git
+   cd SmartClass_QR
    ```
 
 2. **Install dependensi PHP dan Node**

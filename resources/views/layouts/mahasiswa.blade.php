@@ -138,5 +138,37 @@
         </script>
     @endif
 
+    {{-- Session Timeout Auto-Logout --}}
+    <script>
+    (function() {
+        const sessionLifetime = {{ config('session.lifetime') }} * 60 * 1000;
+        let logoutTimer;
+
+        function resetTimer() {
+            clearTimeout(logoutTimer);
+            logoutTimer = setTimeout(showExpiredAlert, sessionLifetime);
+        }
+
+        function showExpiredAlert() {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Sesi Login Berakhir',
+                text: 'Sesi login telah berakhir, harap login kembali.',
+                confirmButtonText: 'Login Kembali',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl' }
+            }).then(() => {
+                window.location.href = '{{ route("login") }}';
+            });
+        }
+
+        ['click', 'keypress', 'scroll', 'mousemove'].forEach(event => {
+            document.addEventListener(event, resetTimer, { passive: true });
+        });
+
+        resetTimer();
+    })();
+    </script>
 </body>
 </html>

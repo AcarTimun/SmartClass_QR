@@ -23,6 +23,30 @@ class SesiPresensiController extends Controller
     {
         $sesi = SesiPresensi::findOrFail($sesi_id);
 
+        // Cek apakah ada sesi lain di jadwal kuliah yang sama yang sedang aktif (dibuka dan belum expired)
+        $activeSession = SesiPresensi::where('jadwal_kuliah_id', $sesi->jadwal_kuliah_id)
+            ->where('id', '!=', $sesi->id)
+            ->where('status', 'dibuka')
+            ->get()
+            ->first(function ($s) {
+                return $s->isDibuka();
+            });
+
+        if ($activeSession) {
+            session()->flash('error', 'Gagal membuka QR. Sesi ' . $activeSession->pertemuan_label . ' sedang aktif. Harap tutup sesi tersebut terlebih dahulu atau tunggu sampai waktunya habis.');
+            
+            if (auth()->user()->role === 'dosen') {
+                return redirect()->route('dosen.presensi.lihat', [
+                    'jadwal' => $sesi->jadwal_kuliah_id,
+                    'sesi_id' => $sesi->id
+                ]);
+            }
+            return redirect()->route('admin.presensi.lihat', [
+                'jadwal' => $sesi->jadwal_kuliah_id,
+                'sesi_id' => $sesi->id
+            ]);
+        }
+
         $sesi->update([
             'qr_token' => Str::random(40),
             'status' => 'dibuka',
@@ -39,6 +63,20 @@ class SesiPresensiController extends Controller
     {
         $sesi = SesiPresensi::where('qr_token', $token)->firstOrFail();
 
+        // Cek apakah sesi masih aktif
+        if (!$sesi->isDibuka()) {
+            if (auth()->user()->role === 'dosen') {
+                return redirect()->route('dosen.presensi.lihat', [
+                    'jadwal' => $sesi->jadwal_kuliah_id,
+                    'sesi_id' => $sesi->id
+                ])->with('error', 'Sesi QR sudah expired atau ditutup');
+            }
+            return redirect()->route('admin.presensi.lihat', [
+                'jadwal' => $sesi->jadwal_kuliah_id,
+                'sesi_id' => $sesi->id
+            ])->with('error', 'Sesi QR sudah expired atau ditutup');
+        }
+
         $renderer = new ImageRenderer(
             new RendererStyle(300),
             new SvgImageBackEnd()
@@ -48,11 +86,13 @@ class SesiPresensiController extends Controller
 
         $qr = $writer->writeString(route('presensi.scan', $sesi->qr_token));
 
+        $remainingSeconds = $sesi->getRemainingSeconds();
+
        if (auth()->user()->role === 'dosen') {
-            return view('dosen.presensi.qr', compact('qr', 'sesi'));
+            return view('dosen.presensi.qr', compact('qr', 'sesi', 'remainingSeconds'));
         }
 
-        return view('admin.presensi.qr', compact('qr', 'sesi'));
+        return view('admin.presensi.qr', compact('qr', 'sesi', 'remainingSeconds'));
     }
 
     public function scan($token)
@@ -86,6 +126,14 @@ class SesiPresensiController extends Controller
             return view('mahasiswa.scan');
         }
 
+        // Cek apakah mahasiswa terdaftar di kelas yang sesuai dengan sesi ini
+        $jadwal = $sesi->jadwalKuliah()->with('kelas')->first();
+        if ($jadwal && $mahasiswa->kelas_id !== $jadwal->kelas_id) {
+            session()->flash('error', 'Anda tidak terdaftar di kelas ini. Hanya mahasiswa yang terdaftar di kelas ' . $jadwal->kelas->nama_kelas . ' yang dapat melakukan absensi.');
+
+            return view('mahasiswa.scan');
+        }
+
         Kehadiran::updateOrCreate(
             [
                 'sesi_presensi_id' => $sesi->id,
@@ -110,7 +158,7 @@ class SesiPresensiController extends Controller
     public function aktif($jadwal_id)
     {
         $sesi = SesiPresensi::where('jadwal_kuliah_id', $jadwal_id)
-            ->latest()
+            ->where('status', 'dibuka')
             ->first();
 
         if (!$sesi || !$sesi->isDibuka()) {

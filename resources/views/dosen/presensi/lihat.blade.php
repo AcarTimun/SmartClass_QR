@@ -124,7 +124,14 @@
                             <thead>
                                 <tr class="bg-slate-50/50 border-b border-slate-100">
                                     <th class="p-4 px-6 font-semibold text-slate-600">Mahasiswa</th>
-                                    <th class="p-4 px-6 font-semibold text-slate-600 text-center w-28">Hadir</th>
+                                    <th class="p-4 px-6 font-semibold text-slate-600 text-center w-28">
+                                        Hadir
+                                        <button type="button" id="hadir-semua-btn"
+                                            class="ml-1 text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-700 px-2 py-0.5 rounded-lg font-bold transition-colors"
+                                            title="Centang semua hadir">
+                                            Semua
+                                        </button>
+                                    </th>
                                     <th class="p-4 px-6 font-semibold text-slate-600 text-center w-28">Tidak Hadir</th>
                                     <th class="p-4 px-6 font-semibold text-slate-600 text-center w-28">Status</th>
                                 </tr>
@@ -260,6 +267,29 @@
 @endif
 
 <script>
+    // Hadir Semua button
+    const hadirSemuaBtn = document.getElementById('hadir-semua-btn');
+    if (hadirSemuaBtn) {
+        hadirSemuaBtn.addEventListener('click', function() {
+            isEditing = true;
+            document.querySelectorAll('input[type="radio"][value="hadir"]').forEach(radio => {
+                radio.checked = true;
+            });
+            // Update visual status
+            document.querySelectorAll('[id^="status-"]').forEach(el => {
+                el.innerHTML = '<span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 font-bold" title="Hadir">H</span>';
+            });
+            Swal.fire({
+                icon: 'success',
+                title: 'Semua Hadir',
+                text: 'Semua mahasiswa telah ditandai hadir. Jangan lupa klik Simpan Absensi.',
+                timer: 2000,
+                showConfirmButton: false,
+                customClass: { popup: 'rounded-3xl' }
+            });
+        });
+    }
+
     // Konfirmasi tutup presensi dengan SweetAlert2
     document.querySelectorAll('.select-tutup-form').forEach(form => {
         form.addEventListener('submit', function(e) {
