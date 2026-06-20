@@ -20,11 +20,24 @@ class MahasiswaController extends Controller
         'Teknologi Informatika'
     ];
 
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search');
+        $perPage = $request->input('per_page', 10);
+
         $mahasiswa = Mahasiswa::with(['user', 'kelas'])
+            ->when($search, function ($query, $search) {
+                $query->whereHas('user', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })->orWhere('nim', 'like', "%{$search}%")
+                  ->orWhere('prodi', 'like', "%{$search}%")
+                  ->orWhereHas('kelas', function ($q) use ($search) {
+                      $q->where('nama_kelas', 'like', "%{$search}%");
+                  });
+            })
             ->latest()
-            ->get();
+            ->paginate($perPage)
+            ->withQueryString();
 
         return view('admin.mahasiswa.index', compact('mahasiswa'));
     }

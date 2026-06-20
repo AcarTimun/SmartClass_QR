@@ -14,14 +14,29 @@ use Illuminate\Support\Str;
 
 class JadwalKuliahController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search');
+        $perPage = $request->input('per_page', 10);
+
         $jadwalKuliah = JadwalKuliah::with([
             'dosen.user',
             'mataKuliah',
             'kelas',
             'sesiPresensi'
-        ])->get();
+        ])
+        ->when($search, function ($query, $search) {
+            $query->whereHas('mataKuliah', function ($q) use ($search) {
+                $q->where('nama_mk', 'like', "%{$search}%");
+            })->orWhereHas('dosen.user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            })->orWhereHas('kelas', function ($q) use ($search) {
+                $q->where('nama_kelas', 'like', "%{$search}%");
+            });
+        })
+        ->latest()
+        ->paginate($perPage)
+        ->withQueryString();
 
         return view('admin.jadwal_kuliah.index', compact('jadwalKuliah'));
     }

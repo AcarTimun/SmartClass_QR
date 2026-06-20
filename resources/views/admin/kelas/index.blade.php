@@ -18,6 +18,39 @@
 </div>
 
 <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+    {{-- Search & Pagination Header --}}
+    <div class="p-4 border-b border-slate-100 bg-slate-50/30 flex flex-col sm:flex-row gap-4 justify-between items-center">
+        <form action="{{ route('admin.kelas.index') }}" method="GET" class="flex flex-col sm:flex-row gap-3 w-full justify-between">
+            <div class="flex items-center gap-2">
+                <span class="text-sm text-slate-500 font-medium">Tampilkan</span>
+                <select name="per_page" onchange="this.form.submit()" class="border-slate-200 rounded-xl text-sm focus:ring-indigo-500 focus:border-indigo-500 py-2 pl-3 pr-8">
+                    <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
+                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                    <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                </select>
+                <span class="text-sm text-slate-500 font-medium">data</span>
+            </div>
+            
+            <div class="flex gap-2">
+                <div class="relative w-full sm:w-64">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <i class="ph ph-magnifying-glass text-slate-400 text-lg"></i>
+                    </div>
+                    <input type="text" name="search" value="{{ request('search') }}" class="bg-white border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 p-2 shadow-sm" placeholder="Cari Nama Kelas...">
+                </div>
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm">
+                    Cari
+                </button>
+                @if(request('search'))
+                    <a href="{{ route('admin.kelas.index') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors shadow-sm" title="Reset Pencarian">
+                        <i class="ph ph-x"></i>
+                    </a>
+                @endif
+            </div>
+        </form>
+    </div>
+
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
@@ -28,10 +61,10 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
-                @forelse($kelas as $item)
+                @forelse($kelas as $index => $item)
                     <tr class="hover:bg-slate-50/50 transition-colors group">
                         <td class="p-4 px-6 text-slate-500">
-                            {{ $loop->iteration }}
+                            {{ $kelas->firstItem() + $index }}
                         </td>
                         <td class="p-4 px-6">
                             <div class="font-medium text-slate-800">{{ $item->nama_kelas }}</div>
@@ -68,6 +101,12 @@
             </tbody>
         </table>
     </div>
+
+    @if($kelas->hasPages())
+    <div class="p-4 border-t border-slate-100">
+        {{ $kelas->links() }}
+    </div>
+    @endif
 </div>
 
 <script>

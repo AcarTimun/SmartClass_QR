@@ -161,6 +161,9 @@ Route::middleware(['auth', 'role:mahasiswa'])->group(function () {
     Route::get('/scan-camera', function () {
         return view('mahasiswa.scan_camera');
     })->name('mahasiswa.scan.camera');
+    // Civitas
+    Route::get('/mahasiswa/civitas', [\App\Http\Controllers\Mahasiswa\CivitasController::class, 'index'])
+        ->name('mahasiswa.civitas');
 });
 
 

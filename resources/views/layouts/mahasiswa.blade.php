@@ -42,6 +42,7 @@
                         $navItems = [
                             ['route' => 'mahasiswa.dashboard', 'icon' => 'ph-squares-four', 'label' => 'Dashboard'],
                             ['route' => 'mahasiswa.kehadiran', 'icon' => 'ph-clipboard-text', 'label' => 'Rekap Kehadiran'],
+                            ['route' => 'mahasiswa.civitas', 'icon' => 'ph-users', 'label' => 'Civitas Akademika'],
                         ];
                     @endphp
 

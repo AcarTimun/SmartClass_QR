@@ -11,9 +11,20 @@ use Illuminate\Support\Facades\Hash;
 
 class DosenController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $dosen = Dosen::with('user')->latest()->get();
+        $search = $request->input('search');
+        $perPage = $request->input('per_page', 10);
+
+        $dosen = Dosen::with('user')
+            ->when($search, function ($query, $search) {
+                $query->whereHas('user', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })->orWhere('nidn', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate($perPage)
+            ->withQueryString();
 
         return view('admin.dosen.index', compact('dosen'));
     }

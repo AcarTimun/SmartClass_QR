@@ -8,9 +8,17 @@ use Illuminate\Http\Request;
 
 class KelasController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $kelas = Kelas::latest()->get();
+        $search = $request->input('search');
+        $perPage = $request->input('per_page', 10);
+
+        $kelas = Kelas::when($search, function ($query, $search) {
+                $query->where('nama_kelas', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate($perPage)
+            ->withQueryString();
 
         return view('admin.kelas.index', compact('kelas'));
     }
