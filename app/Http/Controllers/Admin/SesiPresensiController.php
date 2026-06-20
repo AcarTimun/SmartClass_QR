@@ -149,13 +149,23 @@ class SesiPresensiController extends Controller
 
         if ($sesi) {
             $sesi->load('kehadiran.mahasiswa.user');
+            
+            $totalMahasiswa = $jadwal->kelas->mahasiswa->count();
+            $hadir = $sesi->kehadiran->where('status', 'H')->count();
+            $tidakHadir = $sesi->kehadiran->where('status', 'X')->count();
+            $belumDiisi = $totalMahasiswa - ($hadir + $tidakHadir);
+        } else {
+            $totalMahasiswa = 0;
+            $hadir = 0;
+            $tidakHadir = 0;
+            $belumDiisi = 0;
         }
 
         if (auth()->user()->role === 'dosen') {
-            return view('dosen.presensi.lihat', compact('jadwal', 'sessions', 'sesi'));
+            return view('dosen.presensi.lihat', compact('jadwal', 'sessions', 'sesi', 'totalMahasiswa', 'hadir', 'tidakHadir', 'belumDiisi'));
         }
 
-        return view('admin.presensi.lihat', compact('jadwal', 'sessions', 'sesi'));
+        return view('admin.presensi.lihat', compact('jadwal', 'sessions', 'sesi', 'totalMahasiswa', 'hadir', 'tidakHadir', 'belumDiisi'));
     }
 
 
@@ -238,6 +248,23 @@ class SesiPresensiController extends Controller
                     ]
                 );
             }
+        }
+
+        // Auto-mark semua mahasiswa yang belum hadir/diabsen sebagai 'X'
+        $jadwal = $sesi->jadwalKuliah()->with('kelas.mahasiswa')->first();
+        $allMahasiswaIds = $jadwal->kelas->mahasiswa->pluck('id');
+
+        $sudahDiabsenIds = Kehadiran::where('sesi_presensi_id', $sesi->id)
+            ->whereIn('status', ['H', 'X'])
+            ->pluck('mahasiswa_id');
+
+        $belumHadirIds = $allMahasiswaIds->diff($sudahDiabsenIds);
+
+        foreach ($belumHadirIds as $mhsId) {
+            Kehadiran::updateOrCreate(
+                ['sesi_presensi_id' => $sesi->id, 'mahasiswa_id' => $mhsId],
+                ['status' => 'X']
+            );
         }
 
         if (auth()->user()->role === 'dosen') {

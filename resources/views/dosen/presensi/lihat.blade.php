@@ -94,7 +94,27 @@
                 @endif
             </div>
 
-            <form action="{{ route('dosen.presensi.bulk') }}" method="POST">
+            {{-- STATISTIK SESI --}}
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 mt-2">
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm text-center">
+                    <div class="text-sm text-slate-500 font-semibold">Total Mahasiswa</div>
+                    <div class="text-2xl font-bold text-slate-800">{{ $totalMahasiswa }}</div>
+                </div>
+                <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-100 shadow-sm text-center">
+                    <div class="text-sm text-emerald-600 font-semibold">Hadir</div>
+                    <div class="text-2xl font-bold text-emerald-700">{{ $hadir }}</div>
+                </div>
+                <div class="bg-rose-50 p-4 rounded-2xl border border-rose-100 shadow-sm text-center">
+                    <div class="text-sm text-rose-600 font-semibold">Tidak Hadir</div>
+                    <div class="text-2xl font-bold text-rose-700">{{ $tidakHadir }}</div>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <div class="text-sm text-slate-500 font-semibold">Belum Diisi</div>
+                    <div class="text-2xl font-bold text-slate-700">{{ $belumDiisi }}</div>
+                </div>
+            </div>
+
+            <form action="{{ route('dosen.presensi.bulk') }}" method="POST" id="simpan-absensi-form">
                 @csrf
                 <input type="hidden" name="sesi_id" value="{{ $sesi->id }}">
 
@@ -265,5 +285,31 @@
             });
         });
     });
+    // Konfirmasi simpan absensi dengan SweetAlert2
+    const simpanForm = document.getElementById('simpan-absensi-form');
+    if (simpanForm) {
+        simpanForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Simpan Absensi?',
+                text: 'Mahasiswa yang belum diabsen (berstatus "-") akan otomatis ditandai sebagai "Tidak Hadir" (X). Anda yakin?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#4f46e5',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Simpan',
+                cancelButtonText: 'Batal',
+                customClass: {
+                    popup: 'rounded-3xl',
+                    confirmButton: 'rounded-xl',
+                    cancelButton: 'rounded-xl'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    simpanForm.submit();
+                }
+            });
+        });
+    }
 </script>
 @endsection
