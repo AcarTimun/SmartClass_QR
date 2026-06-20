@@ -7,7 +7,8 @@
 
         <title>{{ $title ?? config('app.name', 'SmartClass QR') }}</title>
 
-        <!-- Scripts -->
+        <!-- Scripts & Icons -->
+        <script src="https://unpkg.com/@phosphor-icons/web"></script>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans text-slate-800 antialiased bg-slate-50">

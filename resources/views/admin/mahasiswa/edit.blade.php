@@ -33,10 +33,16 @@
                         <x-input-error :messages="$errors->get('name')" class="mt-2" />
                     </div>
 
-                    <div class="md:col-span-2">
+                    <div class="md:col-span-1">
                         <x-input-label for="email" value="Email" class="font-medium text-slate-700" />
                         <x-text-input id="email" class="block mt-2 w-full" type="email" name="email" :value="old('email', $mahasiswa->user->email)" required />
                         <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                    </div>
+
+                    <div class="md:col-span-1">
+                        <x-input-label for="password" value="Password Baru" class="font-medium text-slate-700" />
+                        <x-text-input id="password" class="block mt-2 w-full" type="password" name="password" placeholder="Kosongkan jika tidak diubah" />
+                        <x-input-error :messages="$errors->get('password')" class="mt-2" />
                     </div>
                 </div>
             </div>
@@ -50,7 +56,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="md:col-span-2">
                         <x-input-label for="nim" value="NIM" class="font-medium text-slate-700" />
-                        <x-text-input id="nim" class="block mt-2 w-full" type="text" name="nim" :value="old('nim', $mahasiswa->nim)" required />
+                        <x-text-input id="nim" class="block mt-2 w-full bg-slate-100 text-slate-500 cursor-not-allowed select-none" type="text" name="nim" :value="old('nim', $mahasiswa->nim)" readonly />
+                        <p class="text-xs text-rose-500 mt-1 font-medium">* NIM merupakan identitas unik dan tidak dapat diubah setelah terdaftar.</p>
                         <x-input-error :messages="$errors->get('nim')" class="mt-2" />
                     </div>
 

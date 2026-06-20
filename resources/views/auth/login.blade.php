@@ -22,10 +22,16 @@
         <div>
             <x-input-label for="password" :value="__('Password')" class="font-medium text-slate-700" />
 
-            <x-text-input id="password" class="block mt-2 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" placeholder="••••••••" />
+            <div class="relative mt-2">
+                <x-text-input id="password" class="block w-full pr-12"
+                                type="password"
+                                name="password"
+                                required autocomplete="current-password" placeholder="••••••••" />
+                
+                <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none transition-colors">
+                    <i class="ph ph-eye text-xl" id="eyeIcon"></i>
+                </button>
+            </div>
 
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
@@ -37,11 +43,9 @@
                 <span class="ms-3 text-sm font-medium text-slate-600">{{ __('Ingat saya') }}</span>
             </label>
 
-            @if (Route::has('password.request'))
-                <a class="text-sm font-semibold text-indigo-600 hover:text-indigo-500 transition duration-200 focus:outline-none" href="{{ route('password.request') }}">
-                    {{ __('Lupa password?') }}
-                </a>
-            @endif
+            <div class="text-sm font-medium text-slate-500">
+                Lupa password? <span class="text-indigo-600">Hubungi Admin.</span>
+            </div>
         </div>
 
         <div class="pt-4">
@@ -51,4 +55,25 @@
         </div>
 
     </form>
+
+    <script>
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+        const eyeIcon = document.querySelector('#eyeIcon');
+
+        togglePassword.addEventListener('click', function (e) {
+            // toggle the type attribute
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            
+            // toggle the icon
+            if(type === 'password') {
+                eyeIcon.classList.remove('ph-eye-slash');
+                eyeIcon.classList.add('ph-eye');
+            } else {
+                eyeIcon.classList.remove('ph-eye');
+                eyeIcon.classList.add('ph-eye-slash');
+            }
+        });
+    </script>
 </x-guest-layout>

@@ -29,7 +29,8 @@
 
                 <div class="md:col-span-1">
                     <x-input-label for="nidn" value="NIDN" class="font-medium text-slate-700" />
-                    <x-text-input id="nidn" class="block mt-2 w-full" type="text" name="nidn" :value="old('nidn', $dosen->nidn)" required />
+                    <x-text-input id="nidn" class="block mt-2 w-full bg-slate-100 text-slate-500 cursor-not-allowed select-none" type="text" name="nidn" :value="old('nidn', $dosen->nidn)" readonly />
+                    <p class="text-xs text-rose-500 mt-1 font-medium">* NIDN merupakan identitas unik dan tidak dapat diubah.</p>
                     <x-input-error :messages="$errors->get('nidn')" class="mt-2" />
                 </div>
                 
@@ -37,6 +38,12 @@
                     <x-input-label for="email" value="Email" class="font-medium text-slate-700" />
                     <x-text-input id="email" class="block mt-2 w-full" type="email" name="email" :value="old('email', $dosen->user->email)" required />
                     <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                </div>
+
+                <div class="md:col-span-2">
+                    <x-input-label for="password" value="Password Baru" class="font-medium text-slate-700" />
+                    <x-text-input id="password" class="block mt-2 w-full" type="password" name="password" placeholder="Kosongkan jika tidak diubah" />
+                    <x-input-error :messages="$errors->get('password')" class="mt-2" />
                 </div>
             </div>
 

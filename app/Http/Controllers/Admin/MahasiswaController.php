@@ -86,21 +86,26 @@ class MahasiswaController extends Controller
         $validated = $request->validate([
             'name' => 'required|max:100',
             'email' => 'required|email|unique:users,email,' . $mahasiswa->user_id . ',id',
+            'password' => 'nullable|min:8',
             'prodi' => 'required|in:' . implode(',', self::PRODI),
-            'nim' => 'required|max:50|unique:mahasiswa,nim,' . $mahasiswa->id . ',id',
             'kelas_id' => 'required|exists:kelas,id',
         ]);
 
         DB::transaction(function () use ($validated, $mahasiswa) {
 
-            $mahasiswa->user->update([
+            $userData = [
                 'name' => $validated['name'],
                 'email' => $validated['email'],
-            ]);
+            ];
+
+            if (!empty($validated['password'])) {
+                $userData['password'] = Hash::make($validated['password']);
+            }
+
+            $mahasiswa->user->update($userData);
 
             $mahasiswa->update([
                 'prodi' => $validated['prodi'],
-                'nim' => $validated['nim'],
                 'kelas_id' => $validated['kelas_id'],
             ]);
         });

@@ -69,19 +69,21 @@ class DosenController extends Controller
         $validated = $request->validate([
             'name' => 'required|max:100',
             'email' => 'required|email|unique:users,email,' . $dosen->user_id,
-            'nidn' => 'required|max:50|unique:dosen,nidn,' . $dosen->id,
+            'password' => 'nullable|min:8',
         ]);
 
         DB::transaction(function () use ($validated, $dosen) {
 
-            $dosen->user->update([
+            $userData = [
                 'name' => $validated['name'],
                 'email' => $validated['email'],
-            ]);
+            ];
 
-            $dosen->update([
-                'nidn' => $validated['nidn'],
-            ]);
+            if (!empty($validated['password'])) {
+                $userData['password'] = Hash::make($validated['password']);
+            }
+
+            $dosen->user->update($userData);
         });
 
         return redirect()
