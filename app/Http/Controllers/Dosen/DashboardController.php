@@ -20,11 +20,15 @@ class DashboardController extends Controller
         // jumlah jadwal
         $totalJadwal = JadwalKuliah::where('dosen_id', $dosen->id)->count();
 
-        // sesi aktif
-        $sesiAktif = SesiPresensi::where('status', 'dibuka')->count();
+        // ID jadwal milik dosen ini
+        $dosenJadwalIds = JadwalKuliah::where('dosen_id', $dosen->id)->pluck('id');
 
-        // total sesi (semua pertemuan)
-        $totalSesi = SesiPresensi::count();
+        // sesi aktif (hanya milik dosen ini)
+        $sesiAktif = SesiPresensi::whereIn('jadwal_kuliah_id', $dosenJadwalIds)
+            ->where('status', 'dibuka')->count();
+
+        // total sesi (hanya milik dosen ini)
+        $totalSesi = SesiPresensi::whereIn('jadwal_kuliah_id', $dosenJadwalIds)->count();
 
         return view('dosen.dashboard', compact(
             'totalJadwal',

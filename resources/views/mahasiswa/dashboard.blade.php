@@ -62,11 +62,17 @@
                 </div>
 
                 <!-- Call to action -->
-                <div class="mt-8">
+                <div class="mt-8 space-y-3">
                     <a href="{{ route('mahasiswa.scan.camera') }}"
                         class="group relative w-full flex items-center justify-center gap-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white px-6 py-4 rounded-2xl font-bold text-lg hover:shadow-lg hover:shadow-sky-200 transition-all hover:-translate-y-0.5">
                         <i class="ph ph-scan text-2xl group-hover:scale-110 transition-transform"></i>
                         Scan QR Absensi
+                    </a>
+
+                    <a href="{{ route('mahasiswa.kehadiran') }}"
+                        class="group relative w-full flex items-center justify-center gap-3 bg-white border-2 border-slate-200 text-slate-700 px-6 py-4 rounded-2xl font-bold text-lg hover:border-sky-300 hover:text-sky-600 hover:shadow-md transition-all hover:-translate-y-0.5">
+                        <i class="ph ph-clipboard-text text-2xl group-hover:scale-110 transition-transform"></i>
+                        Rekap Kehadiran
                     </a>
                 </div>
 

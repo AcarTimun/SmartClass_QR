@@ -113,7 +113,7 @@
                                 @forelse ($jadwal->kelas->mahasiswa as $mhs)
                                     @php
                                         $data = $sesi->kehadiran->firstWhere('mahasiswa_id', $mhs->id);
-                                        $status = $data->status ?? 'X'; // Default tidak hadir
+                                        $status = $data->status ?? '-'; // Default belum absen
                                     @endphp
                                     <tr class="hover:bg-slate-50/30 transition-colors" id="mhs-{{ $mhs->id }}">
                                         <td class="p-4 px-6">
@@ -147,8 +147,10 @@
                                             <span id="status-{{ $mhs->id }}">
                                                 @if($status == 'H')
                                                     <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 font-bold" title="Hadir">H</span>
+                                                @elseif($status == 'X')
+                                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-rose-50 text-rose-600 font-bold" title="Tidak Hadir">X</span>
                                                 @else
-                                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-rose-50 text-rose-600 font-bold" title="Tidak Hadir">A</span>
+                                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 text-slate-400 font-bold" title="Belum">-</span>
                                                 @endif
                                             </span>
                                         </td>
@@ -215,9 +217,11 @@
                     if (item.status === 'H') {
                         if (statusEl) statusEl.innerHTML = '<span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 font-bold" title="Hadir">H</span>';
                         if (radioHadir) radioHadir.checked = true;
-                    } else {
-                        if (statusEl) statusEl.innerHTML = '<span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-rose-50 text-rose-600 font-bold" title="Tidak Hadir">A</span>';
+                    } else if (item.status === 'X') {
+                        if (statusEl) statusEl.innerHTML = '<span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-rose-50 text-rose-600 font-bold" title="Tidak Hadir">X</span>';
                         if (radioTidak) radioTidak.checked = true;
+                    } else {
+                        if (statusEl) statusEl.innerHTML = '<span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 text-slate-400 font-bold" title="Belum">-</span>';
                     }
 
                     if (lastStatus[item.mahasiswa_id] !== item.status) {

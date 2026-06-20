@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\JadwalKuliahController;
 use App\Http\Controllers\Admin\SesiPresensiController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Dosen\DashboardController as DosenDashboardController;
+use App\Http\Controllers\Mahasiswa\KehadiranController as MahasiswaKehadiranController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -136,8 +137,6 @@ Route::middleware(['auth', 'role:dosen'])->group(function () {
     Route::get('/dosen/jadwal/{jadwal}', [JadwalKuliahController::class, 'showDosen'])
         ->name('dosen.jadwal.show');
 
-    Route::get('/dosen/presensi/{jadwal}/{pertemuan}', [SesiPresensiController::class, 'detail'])
-        ->name('dosen.presensi.detail');
 
     Route::get('/dosen/presensi/data/{sesi}', [SesiPresensiController::class, 'data'])
         ->name('dosen.presensi.data');
@@ -151,6 +150,10 @@ Route::middleware(['auth', 'role:dosen'])->group(function () {
 Route::middleware(['auth', 'role:mahasiswa'])->group(function () {
     Route::view('/mahasiswa/dashboard', 'mahasiswa.dashboard')
         ->name('mahasiswa.dashboard');
+
+    // Rekap Kehadiran
+    Route::get('/mahasiswa/kehadiran', [MahasiswaKehadiranController::class, 'index'])
+        ->name('mahasiswa.kehadiran');
     // QR Scan
     Route::get('/scan/{token}', [SesiPresensiController::class, 'scan'])
     ->name('presensi.scan');

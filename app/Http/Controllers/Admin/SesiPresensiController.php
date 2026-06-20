@@ -168,6 +168,23 @@ class SesiPresensiController extends Controller
             'status' => 'ditutup'
         ]);
 
+        // Auto-mark semua mahasiswa yang belum hadir sebagai 'X'
+        $jadwal = $sesi->jadwalKuliah()->with('kelas.mahasiswa')->first();
+        $allMahasiswaIds = $jadwal->kelas->mahasiswa->pluck('id');
+
+        $sudahHadirIds = Kehadiran::where('sesi_presensi_id', $sesi->id)
+            ->where('status', 'H')
+            ->pluck('mahasiswa_id');
+
+        $belumHadirIds = $allMahasiswaIds->diff($sudahHadirIds);
+
+        foreach ($belumHadirIds as $mhsId) {
+            Kehadiran::updateOrCreate(
+                ['sesi_presensi_id' => $sesi->id, 'mahasiswa_id' => $mhsId],
+                ['status' => 'X']
+            );
+        }
+
         if (auth()->user()->role === 'dosen') {
             return redirect()->route('dosen.presensi.lihat', [
                 'jadwal' => $sesi->jadwal_kuliah_id,

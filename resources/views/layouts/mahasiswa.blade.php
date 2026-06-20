@@ -41,6 +41,7 @@
                     @php
                         $navItems = [
                             ['route' => 'mahasiswa.dashboard', 'icon' => 'ph-squares-four', 'label' => 'Dashboard'],
+                            ['route' => 'mahasiswa.kehadiran', 'icon' => 'ph-clipboard-text', 'label' => 'Rekap Kehadiran'],
                         ];
                     @endphp
 
