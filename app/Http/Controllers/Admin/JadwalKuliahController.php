@@ -8,6 +8,9 @@ use App\Models\JadwalKuliah;
 use App\Models\Kelas;
 use App\Models\MataKuliah;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\SesiPresensi;
+use Illuminate\Support\Str;
 
 class JadwalKuliahController extends Controller
 {
@@ -23,9 +26,17 @@ class JadwalKuliahController extends Controller
         return view('admin.jadwal_kuliah.index', compact('jadwalKuliah'));
     }
     public function indexDosen(){
-        $jadwalKuliah = JadwalKuliah::where('dosen_id', auth()->user()->dosen->id)->get();
+        $user = Auth::user();
+        $dosen = $user->dosen;
 
-        return view('dosen.jadwal.index', compact('jadwalKuliah'));
+        $jadwal = \App\Models\JadwalKuliah::with(['mataKuliah', 'kelas'])
+            ->where('dosen_id', $dosen->id)
+            ->orderBy('hari')
+            ->orderBy('jam_mulai')
+            ->get()
+            ->groupBy('hari');
+
+        return view('dosen.jadwal_kuliah.index', compact('jadwal'));
     }
 
     public function create()
@@ -52,12 +63,22 @@ class JadwalKuliahController extends Controller
             'jam_selesai' => 'required|after:jam_mulai',
         ]);
 
-        JadwalKuliah::create($validated);
+        $jadwal = JadwalKuliah::create($validated);
+
+        // Pre-create 16 SesiPresensi sessions (14 meetings, 1 UTS, 1 UAS)
+        for ($i = 1; $i <= 16; $i++) {
+            SesiPresensi::create([
+                'jadwal_kuliah_id' => $jadwal->id,
+                'pertemuan' => $i,
+                'qr_token' => Str::random(40),
+                'status' => 'ditutup',
+            ]);
+        }
 
         return redirect()
             ->route('admin.jadwal_kuliah.index')
-            ->with('success', 'Jadwal kuliah berhasil ditambahkan.');
-        }
+            ->with('success', 'Jadwal kuliah dan 16 sesi presensi berhasil ditambahkan.');
+    }
 
     public function show(JadwalKuliah $jadwalKuliah)
     {
@@ -94,7 +115,7 @@ class JadwalKuliahController extends Controller
         return redirect()
             ->route('admin.jadwal_kuliah.index')
             ->with('success', 'Jadwal kuliah berhasil diperbarui.');
-        }
+    }
 
     public function destroy(JadwalKuliah $jadwalKuliah)
     {
@@ -103,5 +124,14 @@ class JadwalKuliahController extends Controller
         return redirect()
             ->route('admin.jadwal_kuliah.index')
             ->with('success', 'Jadwal kuliah berhasil dihapus.');
-        }
+    }
+
+    public function showDosen($id)
+    {
+        $jadwal = JadwalKuliah::with(['mataKuliah', 'kelas'])
+            ->findOrFail($id);
+
+        return view('dosen.jadwal_detail', compact('jadwal'));
+    }
+
 }

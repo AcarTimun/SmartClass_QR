@@ -1,11 +1,11 @@
-@extends('layouts.admin')
+@extends('layouts.dosen')
 
 @section('title', 'Rekap Absensi')
 
 @section('content')
 <div class="mb-6">
-    <a href="{{ route('admin.jadwal_kuliah.index') }}" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors gap-1 mb-2">
-        <i class="ph ph-arrow-left"></i> Kembali ke Jadwal Kuliah
+    <a href="{{ route('dosen.jadwal_kuliah') }}" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors gap-1 mb-2">
+        <i class="ph ph-arrow-left"></i> Kembali ke Jadwal Mengajar
     </a>
     <h1 class="text-2xl font-bold text-slate-800">Rekap & Kelola Absensi</h1>
     <p class="text-slate-500 mt-1">{{ $jadwal->mataKuliah->nama_mk }} ({{ $jadwal->kelas->nama_kelas }})</p>
@@ -28,7 +28,7 @@
                 <div class="p-3.5 rounded-2xl border transition-all flex flex-col md:flex-row md:items-center justify-between gap-3
                     {{ $isActive ? 'border-indigo-600 bg-indigo-50/30 ring-1 ring-indigo-600' : 'border-slate-100 hover:border-slate-300 bg-white' }}">
                     
-                    <a href="{{ route('admin.presensi.lihat', ['jadwal' => $jadwal->id, 'sesi_id' => $item->id]) }}" class="flex-1 text-left">
+                    <a href="{{ route('dosen.presensi.lihat', ['jadwal' => $jadwal->id, 'sesi_id' => $item->id]) }}" class="flex-1 text-left">
                         <div class="font-bold text-slate-800 text-sm md:text-base">
                             {{ $item->pertemuan_label }}
                         </div>
@@ -51,17 +51,17 @@
                     {{-- Aksi Sesi --}}
                     <div class="flex items-center gap-2">
                         @if ($item->status == 'ditutup')
-                            <form action="{{ route('admin.presensi.buka', $item->id) }}" method="POST" class="m-0">
+                            <form action="{{ route('dosen.presensi.buka', $item->id) }}" method="POST" class="m-0">
                                 @csrf
                                 <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm shadow-indigo-100" title="Buka Presensi">
                                     Buka
                                 </button>
                             </form>
                         @elseif ($item->status == 'dibuka')
-                            <a href="{{ route('admin.presensi.qr', $item->qr_token) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm shadow-emerald-100" title="Lihat QR">
+                            <a href="{{ route('dosen.presensi.qr', $item->qr_token) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm shadow-emerald-100" title="Lihat QR">
                                 QR
                             </a>
-                            <form action="{{ route('admin.presensi.tutup', $item->id) }}" method="POST" class="m-0 select-tutup-form">
+                            <form action="{{ route('dosen.presensi.tutup', $item->id) }}" method="POST" class="m-0 select-tutup-form">
                                 @csrf
                                 <button type="submit" class="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm shadow-rose-100" title="Tutup Presensi">
                                     Tutup
@@ -94,7 +94,7 @@
                 @endif
             </div>
 
-            <form action="{{ route('admin.presensi.bulk') }}" method="POST">
+            <form action="{{ route('dosen.presensi.bulk') }}" method="POST">
                 @csrf
                 <input type="hidden" name="sesi_id" value="{{ $sesi->id }}">
 
@@ -203,7 +203,7 @@
     setInterval(() => {
         if (isEditing) return;
 
-        fetch("{{ route('admin.presensi.data', $sesi->id) }}")
+        fetch("{{ route('dosen.presensi.data', $sesi->id) }}")
             .then(res => res.json())
             .then(data => {
                 data.forEach(item => {

@@ -1,122 +1,101 @@
-@extends('layouts.admin')
+@extends('layouts.dosen')
+
+@section('title', 'Jadwal Kuliah')
 
 @section('content')
 
-<div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold">
-        Data Jadwal Kuliah
-    </h1>
-</div>
+<h1 class="text-2xl font-bold mb-6">
+    Jadwal Mengajar
+</h1>
 
+<div class="space-y-6">
 
+    @forelse($jadwal as $hari => $items)
 
-<table class="w-full bg-white rounded shadow overflow-hidden">
+        {{-- HEADER HARI --}}
+        <h2 class="text-xl font-bold text-slate-700">
+            {{ $hari }}
+        </h2>
 
-    <thead class="bg-gray-200">
-        <tr>
-            <th class="p-3 text-left">No</th>
-            <th class="p-3 text-left">Dosen</th>
-            <th class="p-3 text-left">Mata Kuliah</th>
-            <th class="p-3 text-left">Kelas</th>
-            <th class="p-3 text-left">Hari</th>
-            <th class="p-3 text-left">Jam</th>
-            <th class="p-3 text-left">Aksi</th>
-            <th class="p-3 text-left">Status Presensi</th>
-        </tr>
-    </thead>
+        <div class="space-y-4">
 
-    <tbody>
+            @foreach($items as $item)
 
-        @forelse($jadwalKuliah as $item)
-            <tr class="border-t">
+                <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 hover:shadow-md transition-all">
 
-                <td class="p-3">
-                    {{ $loop->iteration }}
-                </td>
+                    <div class="flex justify-between items-center">
 
-                <td class="p-3">
-                    {{ $item->dosen->user->name }}
-                </td>
+                        {{-- LEFT --}}
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800">
+                                {{ $item->mataKuliah->nama_mk }}
+                            </h3>
 
-                <td class="p-3">
-                    <div>
-                        {{ $item->mataKuliah->nama_mk }}
+                            <p class="text-sm text-slate-500">
+                                {{ $item->kelas->nama_kelas }}
+                            </p>
+
+                            <p class="text-xs text-slate-400 mt-1">
+                                {{ $item->hari }} •
+                                {{ \Carbon\Carbon::parse($item->jam_mulai)->format('H:i') }}
+                                -
+                                {{ \Carbon\Carbon::parse($item->jam_selesai)->format('H:i') }}
+                            </p>
+                        </div>
+
+                        {{-- RIGHT --}}
+                        <div class="flex gap-2 items-center">
+
+                            @if ($item->activeSesi)
+                                <a href="{{ route('dosen.presensi.aktif', $item->id) }}"
+                                   class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-sm font-semibold shadow-sm flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                                    Lihat QR Sesi Aktif
+                                </a>
+                            @endif
+
+                            <a href="{{ route('dosen.presensi.lihat', $item->id) }}"
+                               class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm">
+                                Kelola Absensi
+                            </a>
+
+                        </div>
+
                     </div>
 
-                    <small class="text-gray-500">
-                        {{ $item->mataKuliah->kode_mk }}
-                    </small>
-                </td>
+                    {{-- STATUS --}}
+                    <div class="mt-3 flex flex-wrap gap-2">
 
-                <td class="p-3">
-                    {{ $item->kelas->nama_kelas }}
-                </td>
-
-                <td class="p-3">
-                    {{ $item->hari }}
-                </td>
-
-                <td class="p-3">
-                    {{ \Carbon\Carbon::parse($item->jam_mulai)->format('H:i') }}
-                    -
-                    {{ \Carbon\Carbon::parse($item->jam_selesai)->format('H:i') }}
-                </td>
-
-                <td class="p-4 align-middle">
-                    <div class="flex gap-3 items-center">
-                        @if ($item->sesiPresensi && $item->sesiPresensi->isDibuka())
-                            <a href="{{ route('dosen.presensi.aktif', $item->id) }}"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
-                                Lihat QR
-                            </a>
+                        @if ($item->activeSesi)
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
+                                Sesi Aktif: {{ $item->activeSesi->pertemuan_label }}
+                            </span>
                         @else
-                            <form action="{{ route('dosen.presensi.buka', $item->id) }}" method="POST">
-                                @csrf
-                                <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
-                                    Buka Presensi
-                                </button>
-                            </form>
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-500">
+                                Tidak ada sesi aktif
+                            </span>
                         @endif
 
-                        <a href="{{ route('dosen.presensi.lihat', $item->id) }}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-sm">
-                            Lihat Absensi
-                        </a>
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-600">
+                            {{ $item->sesiPresensi->where('status', 'ditutup')->count() }} / 16 Sesi Selesai
+                        </span>
+
                     </div>
 
+                </div>
 
+            @endforeach
 
-                </td>
-                <td class="p-3">
-                    @if ($item->sesiPresensi)
-                        @php $status = $item->sesiPresensi->status_label; @endphp
-                            <span class="
-                                px-3 py-1 rounded-full text-xs font-semibold
-                                {{ $status == 'Dibuka' ? 'bg-green-100 text-green-700' : '' }}
-                                {{ $status == 'Expired' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                                {{ $status == 'Ditutup' ? 'bg-red-100 text-red-700' : '' }}
-                            ">
-                                {{ $status }}
-                            </span>
-                    @else
-                        <span class="text-gray-400">Belum ada sesi</span>
-                    @endif
-                </td>
+        </div>
 
-            </tr>
+    @empty
 
-        @empty
+        <div class="text-center text-slate-500">
+            Belum ada jadwal mengajar
+        </div>
 
-            <tr>
-                <td colspan="8" class="p-3 text-center">
-                    Belum ada data jadwal kuliah
-                </td>
-            </tr>
+    @endforelse
 
-        @endforelse
-
-    </tbody>
-
-</table>
-
+</div>
 
 @endsection

@@ -57,44 +57,32 @@
                         </td>
 
                         <td class="p-4 px-6">
-                            @if ($item->sesiPresensi)
-                                @php $status = $item->sesiPresensi->status_label; @endphp
-                                <span class="
-                                    inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold
-                                    {{ $status == 'Dibuka' ? 'bg-emerald-100 text-emerald-700' : '' }}
-                                    {{ $status == 'Expired' ? 'bg-amber-100 text-amber-700' : '' }}
-                                    {{ $status == 'Ditutup' ? 'bg-rose-100 text-rose-700' : '' }}
-                                ">
-                                    @if($status == 'Dibuka')
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    @endif
-                                    {{ $status }}
-                                </span>
+                            @if ($item->activeSesi)
+                                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 mb-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    Aktif: {{ $item->activeSesi->pertemuan_label }}
+                                </div>
                             @else
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500">
-                                    Belum ada sesi
-                                </span>
+                                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-500 mb-1">
+                                    Tidak ada sesi aktif
+                                </div>
                             @endif
+                            <div class="text-xs text-slate-500 font-medium">
+                                {{ $item->sesiPresensi->where('status', 'ditutup')->count() }} / 16 Sesi Selesai
+                            </div>
                         </td>
 
                         <td class="p-4 px-6">
                             <div class="flex gap-2 justify-center">
-                                @if ($item->sesiPresensi && $item->sesiPresensi->isDibuka())
+                                @if ($item->activeSesi)
                                     <a href="{{ route('admin.presensi.aktif', $item->id) }}"
                                        class="bg-emerald-50 hover:bg-emerald-100 text-emerald-600 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-emerald-200 tooltip" title="Lihat QR">
                                         <i class="ph ph-qr-code text-lg"></i>
                                     </a>
-                                @else
-                                    <form action="{{ route('admin.presensi.buka', $item->id) }}" method="POST" class="m-0">
-                                        @csrf
-                                        <button class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-indigo-200 tooltip" title="Buka Presensi">
-                                            <i class="ph ph-play-circle text-lg"></i>
-                                        </button>
-                                    </form>
                                 @endif
 
                                 <a href="{{ route('admin.presensi.lihat', $item->id) }}" 
-                                   class="bg-sky-50 hover:bg-sky-100 text-sky-600 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-sky-200 tooltip" title="Lihat Rekap Absen">
+                                   class="bg-sky-50 hover:bg-sky-100 text-sky-600 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-sky-200 tooltip" title="Kelola Absensi">
                                     <i class="ph ph-list-checks text-lg"></i>
                                 </a>
                             </div>

@@ -19,14 +19,18 @@ use Carbon\Carbon;
 
 class SesiPresensiController extends Controller
 {
-    public function buka($jadwal_id)
+    public function buka($sesi_id)
     {
-        $sesi = SesiPresensi::create([
-            'jadwal_kuliah_id' => $jadwal_id,
-            'pertemuan' => 1, // nanti bisa dinamis
+        $sesi = SesiPresensi::findOrFail($sesi_id);
+
+        $sesi->update([
             'qr_token' => Str::random(40),
             'status' => 'dibuka',
         ]);
+
+        if (auth()->user()->role === 'dosen') {
+            return redirect()->route('dosen.presensi.qr', $sesi->qr_token);
+        }
 
         return redirect()->route('admin.presensi.qr', $sesi->qr_token);
     }
@@ -43,6 +47,10 @@ class SesiPresensiController extends Controller
         $writer = new Writer($renderer);
 
         $qr = $writer->writeString(route('presensi.scan', $sesi->qr_token));
+
+       if (auth()->user()->role === 'dosen') {
+            return view('dosen.presensi.qr', compact('qr', 'sesi'));
+        }
 
         return view('admin.presensi.qr', compact('qr', 'sesi'));
     }
@@ -109,19 +117,45 @@ class SesiPresensiController extends Controller
             return back()->with('error', 'Tidak ada sesi aktif');
         }
 
+        if (auth()->user()->role === 'dosen') {
+            return redirect()->route('dosen.presensi.qr', $sesi->qr_token);
+        }
+
         return redirect()->route('admin.presensi.qr', $sesi->qr_token);
     }
 
-    public function lihat($jadwal_id)
+    public function lihat($jadwal_id, Request $request)
     {
-        $jadwal = JadwalKuliah::with('kelas.mahasiswa')->findOrFail($jadwal_id);
+        $jadwal = JadwalKuliah::with(['kelas.mahasiswa.user', 'mataKuliah'])->findOrFail($jadwal_id);
 
-        $sesi = SesiPresensi::with('kehadiran')
-            ->where('jadwal_kuliah_id', $jadwal_id)
-            ->latest()
-            ->first();
+        $sessions = SesiPresensi::where('jadwal_kuliah_id', $jadwal_id)
+            ->orderBy('pertemuan')
+            ->get();
 
-        return view('admin.presensi.lihat', compact('jadwal', 'sesi'));
+        $selectedSesiId = $request->query('sesi_id');
+        $sesi = null;
+
+        if ($selectedSesiId) {
+            $sesi = $sessions->firstWhere('id', $selectedSesiId);
+        }
+
+        if (!$sesi) {
+            $sesi = $sessions->firstWhere('status', 'dibuka');
+        }
+
+        if (!$sesi) {
+            $sesi = $sessions->first();
+        }
+
+        if ($sesi) {
+            $sesi->load('kehadiran.mahasiswa.user');
+        }
+
+        if (auth()->user()->role === 'dosen') {
+            return view('dosen.presensi.lihat', compact('jadwal', 'sessions', 'sesi'));
+        }
+
+        return view('admin.presensi.lihat', compact('jadwal', 'sessions', 'sesi'));
     }
 
 
@@ -135,12 +169,16 @@ class SesiPresensiController extends Controller
         ]);
 
         if (auth()->user()->role === 'dosen') {
-            return redirect()->route('dosen.jadwal_kuliah')
-                ->with('success', 'Presensi ditutup');
+            return redirect()->route('dosen.presensi.lihat', [
+                'jadwal' => $sesi->jadwal_kuliah_id,
+                'sesi_id' => $sesi->id
+            ])->with('success', 'Presensi ditutup');
         }
 
-        return redirect()->route('admin.jadwal_kuliah.index')
-            ->with('success', 'Presensi ditutup');
+        return redirect()->route('admin.presensi.lihat', [
+            'jadwal' => $sesi->jadwal_kuliah_id,
+            'sesi_id' => $sesi->id
+        ])->with('success', 'Presensi ditutup');
     }
 
     public function update($sesi_id, $mahasiswa_id, Request $request)
@@ -163,39 +201,44 @@ class SesiPresensiController extends Controller
     public function bulkUpdate(Request $request)
     {
         $sesi_id = $request->sesi_id;
+        $sesi = SesiPresensi::findOrFail($sesi_id);
 
-        foreach ($request->kehadiran as $mahasiswa_id => $status) {
+        if ($request->kehadiran) {
+            foreach ($request->kehadiran as $mahasiswa_id => $status) {
+                $dbStatus = match ($status) {
+                    'hadir' => 'H',
+                    'tidak_hadir' => 'X',
+                    default => '-',
+                };
 
-            $dbStatus = match ($status) {
-                'hadir' => 'H',
-                'tidak_hadir' => 'X',
-                default => '-',
-            };
-
-
-
-
-            Kehadiran::updateOrCreate(
-                [
-                    'sesi_presensi_id' => $sesi_id,
-                    'mahasiswa_id' => $mahasiswa_id,
-                ],
-                [
-                    'status' => $dbStatus,
-                ]
-            );
+                Kehadiran::updateOrCreate(
+                    [
+                        'sesi_presensi_id' => $sesi_id,
+                        'mahasiswa_id' => $mahasiswa_id,
+                    ],
+                    [
+                        'status' => $dbStatus,
+                    ]
+                );
+            }
         }
 
-        return redirect()->route('admin.jadwal_kuliah.index')
-            ->with('success', 'Absensi berhasil disimpan');
+        if (auth()->user()->role === 'dosen') {
+            return redirect()->route('dosen.presensi.lihat', [
+                'jadwal' => $sesi->jadwal_kuliah_id,
+                'sesi_id' => $sesi->id
+            ])->with('success', 'Absensi berhasil disimpan');
+        }
+
+        return redirect()->route('admin.presensi.lihat', [
+            'jadwal' => $sesi->jadwal_kuliah_id,
+            'sesi_id' => $sesi->id
+        ])->with('success', 'Absensi berhasil disimpan');
     }
 
-    public function data($jadwal_id)
+    public function data($sesi_id)
     {
-        $sesi = SesiPresensi::with('kehadiran')
-            ->where('jadwal_kuliah_id', $jadwal_id)
-            ->latest()
-            ->first();
+        $sesi = SesiPresensi::with('kehadiran')->findOrFail($sesi_id);
 
         return response()->json($sesi->kehadiran);
     }

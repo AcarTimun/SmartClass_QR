@@ -36,6 +36,11 @@ class JadwalKuliah extends Model
 
     public function sesiPresensi()
     {
-        return $this->hasOne(SesiPresensi::class)->latestOfMany();
+        return $this->hasMany(SesiPresensi::class)->orderBy('pertemuan');
+    }
+
+    public function activeSesi()
+    {
+        return $this->hasOne(SesiPresensi::class)->where('status', 'dibuka');
     }
 }

@@ -9,7 +9,7 @@
         <!-- Abstract Shapes -->
         <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-white opacity-10 blur-2xl"></div>
         <div class="absolute bottom-0 right-32 -mb-16 w-48 h-48 rounded-full bg-fuchsia-300 opacity-20 blur-xl"></div>
-        
+
         <div class="relative z-10 flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold mb-2">Selamat Datang, {{ auth()->user()->name }}! 👋</h1>
@@ -19,6 +19,25 @@
                 <i class="ph ph-chalkboard-teacher text-5xl text-white"></i>
             </div>
         </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+
+        <div class="bg-white p-6 rounded-2xl shadow text-center">
+            <p class="text-sm text-gray-500">Total Jadwal</p>
+            <h2 class="text-2xl font-bold">{{ $totalJadwal }}</h2>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow text-center">
+            <p class="text-sm text-gray-500">Sesi Aktif</p>
+            <h2 class="text-2xl font-bold text-green-600">{{ $sesiAktif }}</h2>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow text-center">
+            <p class="text-sm text-gray-500">Total Pertemuan</p>
+            <h2 class="text-2xl font-bold">{{ $totalSesi }}</h2>
+        </div>
+
     </div>
 
     <!-- Quick Actions -->

@@ -52,4 +52,18 @@ class SesiPresensi extends Model
         return 'Ditutup';
     }
 
+    public function getPertemuanLabelAttribute()
+    {
+        if ($this->pertemuan >= 1 && $this->pertemuan <= 7) {
+            return 'Pertemuan ' . $this->pertemuan;
+        } elseif ($this->pertemuan == 8) {
+            return 'UTS';
+        } elseif ($this->pertemuan >= 9 && $this->pertemuan <= 15) {
+            return 'Pertemuan ' . ($this->pertemuan - 1);
+        } elseif ($this->pertemuan == 16) {
+            return 'UAS';
+        }
+        return 'Pertemuan ' . $this->pertemuan;
+    }
+
 }
