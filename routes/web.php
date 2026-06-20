@@ -8,7 +8,7 @@ use App\Http\Controllers\Admin\DosenController;
 use App\Http\Controllers\Admin\MahasiswaController;
 use App\Http\Controllers\Admin\JadwalKuliahController;
 use App\Http\Controllers\Admin\SesiPresensiController;
-
+use App\Http\Controllers\Admin\DashboardController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -47,7 +47,7 @@ Route::get('/', function () {
 // group admin
 Route::middleware(['auth', 'role:admin'])->group(function () {
     // Dashboard
-    Route::view('/admin/dashboard', 'admin.dashboard')
+    Route::get('/admin/dashboard', [DashboardController::class, 'index'])
         ->name('admin.dashboard');
     // Kelas
     Route::resource('/admin/kelas', KelasController::class)

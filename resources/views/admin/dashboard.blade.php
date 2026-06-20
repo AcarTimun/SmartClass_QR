@@ -8,7 +8,7 @@
         <!-- Abstract Shapes -->
         <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-white opacity-10 blur-2xl"></div>
         <div class="absolute bottom-0 right-32 -mb-16 w-48 h-48 rounded-full bg-sky-300 opacity-20 blur-xl"></div>
-        
+
         <div class="relative z-10 flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold mb-2">Selamat Datang, {{ auth()->user()->name }}! </h1>
@@ -29,7 +29,7 @@
             </div>
             <div>
                 <p class="text-sm font-medium text-slate-500 mb-1">Total Dosen</p>
-                <h3 class="text-2xl font-bold text-slate-800">12</h3>
+                <h3 class="text-2xl font-bold text-slate-800">{{ $totalDosen }}</h3>
             </div>
         </div>
 
@@ -40,7 +40,7 @@
             </div>
             <div>
                 <p class="text-sm font-medium text-slate-500 mb-1">Total Mahasiswa</p>
-                <h3 class="text-2xl font-bold text-slate-800">340</h3>
+                <h3 class="text-2xl font-bold text-slate-800">{{ $totalMahasiswa }}</h3>
             </div>
         </div>
 
@@ -51,7 +51,7 @@
             </div>
             <div>
                 <p class="text-sm font-medium text-slate-500 mb-1">Total Kelas</p>
-                <h3 class="text-2xl font-bold text-slate-800">18</h3>
+                <h3 class="text-2xl font-bold text-slate-800">{{ $totalKelas }}</h3>
             </div>
         </div>
 
@@ -62,7 +62,7 @@
             </div>
             <div>
                 <p class="text-sm font-medium text-slate-500 mb-1">Total Mata Kuliah</p>
-                <h3 class="text-2xl font-bold text-slate-800">24</h3>
+                <h3 class="text-2xl font-bold text-slate-800">{{ $totalMataKuliah }}</h3>
             </div>
         </div>
     </div>
